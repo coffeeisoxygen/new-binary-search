@@ -29,28 +29,36 @@ public class Dictionary {
     }
 
     public String findIndonesian(String english) {
+        if (english == null || english.isBlank()) {
+            logger.warn("Search term cannot be null or empty");
+            return null;
+        }
+
         int index = Collections.binarySearch(englishToIndonesian,
-                new Vocabulary(english.toLowerCase(), ""),
+                Vocabulary.searchByEnglish(english),
                 (a, b) -> a.english().compareToIgnoreCase(b.english()));
 
         if (index >= 0) {
             logger.debug("Found translation for: {}", english);
             return englishToIndonesian.get(index).indonesian();
         }
-        logger.debug("No translation found for: {}", english);
         return null;
     }
 
     public String findEnglish(String indonesian) {
+        if (indonesian == null || indonesian.isBlank()) {
+            logger.warn("Search term cannot be null or empty");
+            return null;
+        }
+
         int index = Collections.binarySearch(indonesianToEnglish,
-                new Vocabulary("", indonesian.toLowerCase()),
+                Vocabulary.searchByIndonesian(indonesian),
                 (a, b) -> a.indonesian().compareToIgnoreCase(b.indonesian()));
 
         if (index >= 0) {
             logger.debug("Found translation for: {}", indonesian);
             return indonesianToEnglish.get(index).english();
         }
-        logger.debug("No translation found for: {}", indonesian);
         return null;
     }
 

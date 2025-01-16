@@ -4,17 +4,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 
-public class VocabularyTest {
+class VocabularyTest {
 
     @Test
-    public void testValidVocabulary() {
+    void testValidVocabulary() {
         Vocabulary vocabulary = new Vocabulary("hello", "halo");
         assertEquals("hello", vocabulary.english());
         assertEquals("halo", vocabulary.indonesian());
     }
 
     @Test
-    public void testNullEnglishWord() {
+    void testNullEnglishWord() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             new Vocabulary(null, "halo");
         });
@@ -22,7 +22,7 @@ public class VocabularyTest {
     }
 
     @Test
-    public void testBlankEnglishWord() {
+    void testBlankEnglishWord() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             new Vocabulary(" ", "halo");
         });
@@ -30,7 +30,7 @@ public class VocabularyTest {
     }
 
     @Test
-    public void testNullIndonesianWord() {
+    void testNullIndonesianWord() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             new Vocabulary("hello", null);
         });
@@ -38,7 +38,7 @@ public class VocabularyTest {
     }
 
     @Test
-    public void testBlankIndonesianWord() {
+    void testBlankIndonesianWord() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             new Vocabulary("hello", " ");
         });
