@@ -29,29 +29,37 @@ public class App {
             logger.info("Dictionary loaded with {} words", dictionary.size());
 
             // Demo English to Indonesian
-            String[] englishWords = {"apple", "computer", "unknown"};
-            for (String word : englishWords) {
-                String translation = dictionary.findIndonesian(word);
-                if (translation != null) {
-                    logger.info("English '{}' -> Indonesian '{}'", word, translation);
-                } else {
-                    logger.warn("No translation found for '{}'", word);
-                }
-            }
+            demonstrateEnglishToIndonesian(dictionary);
 
             // Demo Indonesian to English
-            String[] indonesianWords = {"apel", "komputer", "tidak ada"};
-            for (String word : indonesianWords) {
-                String translation = dictionary.findEnglish(word);
-                if (translation != null) {
-                    logger.info("Indonesian '{}' -> English '{}'", word, translation);
-                } else {
-                    logger.warn("No translation found for '{}'", word);
-                }
-            }
+            demonstrateIndonesianToEnglish(dictionary);
 
         } catch (Exception e) {
             logger.error("An error occurred: ", e);
+        }
+    }
+
+    private static void demonstrateEnglishToIndonesian(Dictionary dictionary) {
+        String[] englishWords = {"apple", "computer", "unknown"};
+        for (String word : englishWords) {
+            String translation = dictionary.findIndonesian(word);
+            if (translation != null) {
+                logger.info("English '{}' -> Indonesian '{}'", word, translation);
+            } else {
+                logger.warn("No translation found for '{}'", word);
+            }
+        }
+    }
+
+    private static void demonstrateIndonesianToEnglish(Dictionary dictionary) {
+        String[] indonesianWords = {"apel", "komputer", "tidak ada"};
+        for (String word : indonesianWords) {
+            String translation = dictionary.findEnglish(word);
+            if (translation != null) {
+                logger.info("Indonesian '{}' -> English '{}'", word, translation);
+            } else {
+                logger.warn("No translation found for '{}'", word);
+            }
         }
     }
 }
