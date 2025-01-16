@@ -7,11 +7,11 @@ import org.slf4j.LoggerFactory;
 
 import com.coffeecode.model.Dictionary;
 import com.coffeecode.model.json.JsonParser;
+import com.coffeecode.model.json.JsonParsingException;
 import com.coffeecode.model.json.JsonServices;
 import com.coffeecode.model.record.Vocabulary;
 
 public class App {
-
     private static final Logger logger = LoggerFactory.getLogger(App.class);
 
     public static void main(String[] args) {
@@ -34,19 +34,25 @@ public class App {
             // Demo Indonesian to English
             demonstrateIndonesianToEnglish(dictionary);
 
+        } catch (JsonParsingException e) {
+            logger.error("Failed to parse JSON: {}", e.getMessage());
         } catch (Exception e) {
-            logger.error("An error occurred: ", e);
+            logger.error("An unexpected error occurred: ", e);
         }
     }
 
     private static void demonstrateEnglishToIndonesian(Dictionary dictionary) {
         String[] englishWords = {"apple", "computer", "unknown"};
         for (String word : englishWords) {
-            String translation = dictionary.findIndonesian(word);
-            if (translation != null) {
-                logger.info("English '{}' -> Indonesian '{}'", word, translation);
-            } else {
-                logger.warn("No translation found for '{}'", word);
+            try {
+                String translation = dictionary.findIndonesian(word);
+                if (translation != null) {
+                    logger.info("English '{}' -> Indonesian '{}'", word, translation);
+                } else {
+                    logger.warn("No translation found for '{}'", word);
+                }
+            } catch (Exception e) {
+                logger.error("Error finding translation for '{}': {}", word, e.getMessage());
             }
         }
     }
@@ -54,11 +60,15 @@ public class App {
     private static void demonstrateIndonesianToEnglish(Dictionary dictionary) {
         String[] indonesianWords = {"apel", "komputer", "tidak ada"};
         for (String word : indonesianWords) {
-            String translation = dictionary.findEnglish(word);
-            if (translation != null) {
-                logger.info("Indonesian '{}' -> English '{}'", word, translation);
-            } else {
-                logger.warn("No translation found for '{}'", word);
+            try {
+                String translation = dictionary.findEnglish(word);
+                if (translation != null) {
+                    logger.info("Indonesian '{}' -> English '{}'", word, translation);
+                } else {
+                    logger.warn("No translation found for '{}'", word);
+                }
+            } catch (Exception e) {
+                logger.error("Error finding translation for '{}': {}", word, e.getMessage());
             }
         }
     }
