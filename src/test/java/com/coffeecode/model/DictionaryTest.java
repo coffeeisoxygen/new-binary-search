@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import com.coffeecode.model.record.Vocabulary;
 
 class DictionaryTest {
-
     private Dictionary dictionary;
 
     @BeforeEach
@@ -25,39 +24,37 @@ class DictionaryTest {
     }
 
     @Test
-    void testFindIndonesian() {
-        assertEquals("halo", dictionary.findIndonesian("hello"));
-        assertEquals("dunia", dictionary.findIndonesian("world"));
-        assertEquals("kopi", dictionary.findIndonesian("coffee"));
-        assertNull(dictionary.findIndonesian("nonexistent"));
+    void testTranslateEnglishToIndonesian() {
+        assertEquals("halo", dictionary.translate("hello", Language.ENGLISH));
+        assertEquals("dunia", dictionary.translate("world", Language.ENGLISH));
+        assertEquals("kopi", dictionary.translate("coffee", Language.ENGLISH));
+        assertNull(dictionary.translate("nonexistent", Language.ENGLISH));
     }
 
     @Test
-    void testFindEnglish() {
-        assertEquals("hello", dictionary.findEnglish("halo"));
-        assertEquals("world", dictionary.findEnglish("dunia"));
-        assertEquals("coffee", dictionary.findEnglish("kopi"));
-        assertNull(dictionary.findEnglish("tidak ada"));
+    void testTranslateIndonesianToEnglish() {
+        assertEquals("hello", dictionary.translate("halo", Language.INDONESIAN));
+        assertEquals("world", dictionary.translate("dunia", Language.INDONESIAN));
+        assertEquals("coffee", dictionary.translate("kopi", Language.INDONESIAN));
+        assertNull(dictionary.translate("tidak ada", Language.INDONESIAN));
     }
 
     @Test
-    void testFindIndonesianWithNull() {
-        assertNull(dictionary.findIndonesian(null));
+    void testTranslateWithNull() {
+        assertNull(dictionary.translate(null, Language.ENGLISH));
+        assertNull(dictionary.translate(null, Language.INDONESIAN));
     }
 
     @Test
-    void testFindEnglishWithNull() {
-        assertNull(dictionary.findEnglish(null));
+    void testTranslateWithEmptyString() {
+        assertNull(dictionary.translate("", Language.ENGLISH));
+        assertNull(dictionary.translate("", Language.INDONESIAN));
     }
 
     @Test
-    void testFindIndonesianWithEmptyString() {
-        assertNull(dictionary.findIndonesian(""));
-    }
-
-    @Test
-    void testFindEnglishWithEmptyString() {
-        assertNull(dictionary.findEnglish(""));
+    void testTranslateWithBlankString() {
+        assertNull(dictionary.translate("   ", Language.ENGLISH));
+        assertNull(dictionary.translate("   ", Language.INDONESIAN));
     }
 
     @Test

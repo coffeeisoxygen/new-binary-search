@@ -28,35 +28,40 @@ public class Dictionary {
         logger.info("Dictionary initialized with {} entries", vocabularies.size());
     }
 
-    public String findIndonesian(String english) {
-        if (english == null || english.isBlank()) {
-            logger.warn("Search term cannot be null or empty");
+    // Add new method
+    public String translate(String word, Language sourceLanguage) {
+        if (word == null || word.isBlank()) {
+            logger.warn("Translation term cannot be null or empty");
             return null;
         }
 
+        return switch (sourceLanguage) {
+            case ENGLISH ->
+                findIndonesian(word);
+            case INDONESIAN ->
+                findEnglish(word);
+        };
+    }
+
+    private String findIndonesian(String english) {
         int index = Collections.binarySearch(englishToIndonesian,
                 Vocabulary.searchByEnglish(english),
                 (a, b) -> a.english().compareToIgnoreCase(b.english()));
 
         if (index >= 0) {
-            logger.debug("Found translation for: {}", english);
+            logger.debug("Found Indonesian translation for: {}", english);
             return englishToIndonesian.get(index).indonesian();
         }
         return null;
     }
 
-    public String findEnglish(String indonesian) {
-        if (indonesian == null || indonesian.isBlank()) {
-            logger.warn("Search term cannot be null or empty");
-            return null;
-        }
-
+    private String findEnglish(String indonesian) {
         int index = Collections.binarySearch(indonesianToEnglish,
                 Vocabulary.searchByIndonesian(indonesian),
                 (a, b) -> a.indonesian().compareToIgnoreCase(b.indonesian()));
 
         if (index >= 0) {
-            logger.debug("Found translation for: {}", indonesian);
+            logger.debug("Found English translation for: {}", indonesian);
             return indonesianToEnglish.get(index).english();
         }
         return null;
