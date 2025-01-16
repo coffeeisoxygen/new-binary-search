@@ -1,4 +1,4 @@
-package com.coffeecode.model;
+package com.coffeecode.model.record;
 
 public record Vocabulary(String english, String indonesian) {
 

@@ -1,4 +1,4 @@
-package com.coffeecode.model;
+package com.coffeecode.model.record;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
