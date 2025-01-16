@@ -74,6 +74,7 @@
         <includes>
           <!-- json dictionary sumber aplikasi -->
           <include>**/*.json</include>
+          <include>**/*.xml</include>
         </includes>
       </resource>
     </resources>
