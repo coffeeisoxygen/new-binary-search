@@ -1,4 +1,4 @@
-package com.coffeecode.model.json;
+package com.coffeecode.model.json.service;
 
 import java.io.IOException;
 import java.io.InputStream;

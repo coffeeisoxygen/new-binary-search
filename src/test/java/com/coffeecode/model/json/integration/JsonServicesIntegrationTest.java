@@ -8,8 +8,8 @@ import org.junit.jupiter.api.Test;
 
 import com.coffeecode.config.AppConfig;
 import com.coffeecode.model.Vocabulary;
-import com.coffeecode.model.json.JsonServices;
-import com.coffeecode.model.json.JsonServicesFactory;
+import com.coffeecode.model.json.service.JsonServices;
+import com.coffeecode.model.json.service.JsonServicesFactory;
 
 class JsonServicesIntegrationTest {
 

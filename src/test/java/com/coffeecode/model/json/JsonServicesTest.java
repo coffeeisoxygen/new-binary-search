@@ -19,6 +19,7 @@ import com.coffeecode.config.AppConfig;
 import com.coffeecode.model.Vocabulary;
 import com.coffeecode.model.json.resources.ResourceLoader;
 import com.coffeecode.model.json.schema.SchemaValidatable;
+import com.coffeecode.model.json.service.JsonServices;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.networknt.schema.ValidationMessage;

@@ -1,4 +1,4 @@
-package com.coffeecode.model.json;
+package com.coffeecode.model.json.service;
 
 import com.coffeecode.config.AppConfig;
 import com.coffeecode.model.json.resources.ClassPathResourceLoader;
