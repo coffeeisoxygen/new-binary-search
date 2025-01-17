@@ -1,72 +1,50 @@
 package com.coffeecode.model;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.coffeecode.util.TextUtils;
 
 /**
- * Represents a bilingual vocabulary entry containing English and Indonesian
- * words.
+ * Immutable record representing a bilingual vocabulary entry.
  */
 public record Vocabulary(String english, String indonesian) {
 
-    private static final Logger logger = LoggerFactory.getLogger(Vocabulary.class);
     private static final String SEARCH_DUMMY = "__SEARCH__";
     private static final int MAX_WORD_LENGTH = 100;
 
     public Vocabulary  {
-        validateWord(english, "English", indonesian.equals(SEARCH_DUMMY));
-        validateWord(indonesian, "Indonesian", english.equals(SEARCH_DUMMY));
-        english = english.toLowerCase().trim();
-        indonesian = indonesian.toLowerCase().trim();
+        if (!isValidInput(english, indonesian)) {
+            throw new IllegalArgumentException(
+                    String.format("Invalid vocabulary entry: english='%s', indonesian='%s'",
+                            english, indonesian));
+        }
+        english = TextUtils.sanitizeWord(english);
+        indonesian = TextUtils.sanitizeWord(indonesian);
     }
 
-    private static void validateWord(String word, String language, boolean isSearchTerm) {
-        if ((word == null || word.isBlank()) && !isSearchTerm) {
-            logger.warn("Invalid {} word: {}", language, word);
-            throw new IllegalArgumentException(language + " word cannot be null or blank");
+    private static boolean isValidInput(String english, String indonesian) {
+        return (isValidWord(english) && isValidWord(indonesian))
+                || (english.equals(SEARCH_DUMMY) ^ indonesian.equals(SEARCH_DUMMY));
+    }
 
-        }
-        if (word != null && word.length() > MAX_WORD_LENGTH) {
-            logger.warn("{} word exceeds maximum length of {}: {}", language, MAX_WORD_LENGTH, word);
-            throw new IllegalArgumentException(language + " word exceeds maximum length of " + MAX_WORD_LENGTH);
-        }
+    private static boolean isValidWord(String word) {
+        return word != null
+                && !word.isBlank()
+                && word.length() <= MAX_WORD_LENGTH;
     }
 
     public static Vocabulary searchByLanguage(String word, Language language) {
-        return switch (language) {
-            case ENGLISH ->
-                searchByEnglish(word);
-            case INDONESIAN ->
-                searchByIndonesian(word);
-        };
+        if (word == null || word.isBlank()) {
+            throw new IllegalArgumentException("Search word cannot be null or empty");
+        }
+        return language == Language.ENGLISH
+                ? new Vocabulary(word, SEARCH_DUMMY)
+                : new Vocabulary(SEARCH_DUMMY, word);
     }
 
     public String getWord(Language language) {
-        return switch (language) {
-            case ENGLISH ->
-                english;
-            case INDONESIAN ->
-                indonesian;
-        };
+        return language == Language.ENGLISH ? english : indonesian;
     }
 
-    public boolean isSearchDummy() {
+    public boolean isSearchTerm() {
         return english.equals(SEARCH_DUMMY) || indonesian.equals(SEARCH_DUMMY);
-    }
-
-    @Override
-    public String toString() {
-        if (isSearchDummy()) {
-            return "SearchTerm[" + (english.equals(SEARCH_DUMMY) ? indonesian : english) + "]";
-        }
-        return "Vocabulary[english=" + english + ", indonesian=" + indonesian + "]";
-    }
-
-    public static Vocabulary searchByEnglish(String english) {
-        return new Vocabulary(english.toLowerCase(), SEARCH_DUMMY);
-    }
-
-    public static Vocabulary searchByIndonesian(String indonesian) {
-        return new Vocabulary(SEARCH_DUMMY, indonesian.toLowerCase());
     }
 }

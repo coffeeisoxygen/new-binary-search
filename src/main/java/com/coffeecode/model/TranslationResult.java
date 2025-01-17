@@ -1,5 +1,10 @@
 package com.coffeecode.model;
 
-public record TranslationResult(boolean found, String translation) {
+import java.util.List;
+
+public record TranslationResult(
+        boolean found,
+        String translation,
+        List<SearchStep> searchSteps) {
 
 }

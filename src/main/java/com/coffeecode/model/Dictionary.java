@@ -4,68 +4,59 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.coffeecode.util.TextUtils;
 
 public class Dictionary {
 
-    private static final Logger logger = LoggerFactory.getLogger(Dictionary.class);
     private final List<Vocabulary> englishToIndonesian;
     private final List<Vocabulary> indonesianToEnglish;
 
     public Dictionary(List<Vocabulary> vocabularies) {
         this.englishToIndonesian = new ArrayList<>(vocabularies);
         this.indonesianToEnglish = new ArrayList<>(vocabularies);
+        initializeSortedLists();
+    }
 
-        // Sort for binary search
+    private void initializeSortedLists() {
         Collections.sort(englishToIndonesian,
                 (a, b) -> a.getWord(Language.ENGLISH).compareToIgnoreCase(b.getWord(Language.ENGLISH)));
         Collections.sort(indonesianToEnglish,
                 (a, b) -> a.getWord(Language.INDONESIAN).compareToIgnoreCase(b.getWord(Language.INDONESIAN)));
-
-        logger.info("Dictionary initialized with {} entries", vocabularies.size());
     }
 
-    private String sanitizeInput(String word) {
-        if (word == null) {
-            return null;
-        }
-        return word.trim()
-                // Convert to lowercase
-                .toLowerCase()
-                // Remove non-alphabetic characters except spaces and hyphens
-                .replaceAll("[^a-zA-Z\\s-]", "")
-                // Remove leading and trailing spaces
-                .replaceAll("\\s+", " ");
-    }
-
-    public String translate(String word, Language sourceLanguage) {
-        // Sanitize input first
-        logger.info("Translating {} word: {}", sourceLanguage, word);
-        String sanitizedWord = sanitizeInput(word);
-        logger.info("Sanitized word: {}", sanitizedWord);
+    public String translate(String word, Language sourceLanguage, List<SearchStep> searchSteps) {
+        String sanitizedWord = TextUtils.sanitizeWord(word);
         if (sanitizedWord == null || sanitizedWord.isBlank()) {
-            logger.warn("Translation term cannot be null or empty: {}", word);
             return null;
         }
 
         List<Vocabulary> searchList = sourceLanguage == Language.ENGLISH
                 ? englishToIndonesian : indonesianToEnglish;
 
-        int index = Collections.binarySearch(searchList,
-                Vocabulary.searchByLanguage(sanitizedWord, sourceLanguage),
-                (a, b) -> a.getWord(sourceLanguage).compareToIgnoreCase(b.getWord(sourceLanguage)));
+        return findTranslationWithSteps(sanitizedWord, sourceLanguage, sourceLanguage.opposite(),
+                searchList, searchSteps);
+    }
 
-        if (index >= 0) {
-            Vocabulary found = searchList.get(index);
-            String translation = sourceLanguage == Language.ENGLISH
-                    ? found.indonesian() : found.english();
-            logger.debug("Found translation for {} word '{}': '{}'",
-                    sourceLanguage, word, translation);
-            return translation;
+    private String findTranslationWithSteps(String word, Language sourceLanguage,
+            Language targetLanguage, List<Vocabulary> searchList, List<SearchStep> steps) {
+        int low = 0;
+        int high = searchList.size() - 1;
+
+        while (low <= high) {
+            int mid = (low + high) >>> 1;
+            steps.add(new SearchStep(low, mid, high, searchList.get(mid).getWord(sourceLanguage)));
+
+            Vocabulary midVocab = searchList.get(mid);
+            int comparison = midVocab.getWord(sourceLanguage).compareToIgnoreCase(word);
+
+            if (comparison < 0) {
+                low = mid + 1;
+            } else if (comparison > 0) {
+                high = mid - 1;
+            } else {
+                return midVocab.getWord(targetLanguage);
+            }
         }
-
-        logger.debug("No translation found for {} word: {}", sourceLanguage, word);
         return null;
     }
 
