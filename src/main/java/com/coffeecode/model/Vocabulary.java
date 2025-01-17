@@ -1,50 +1,61 @@
 package com.coffeecode.model;
 
-import com.coffeecode.util.TextUtils;
+import com.coffeecode.validation.WordValidator;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Immutable record representing a bilingual vocabulary entry.
+ * Immutable record representing a bilingual vocabulary entry. Supports JSON
+ * serialization/deserialization and search operations.
  */
-public record Vocabulary(String english, String indonesian) {
+public record Vocabulary(
+        @JsonProperty(value = "english", required = true)
+        String english,
+        @JsonProperty(value = "indonesian", required = true)
+        String indonesian) {
 
     private static final String SEARCH_DUMMY = "__SEARCH__";
-    private static final int MAX_WORD_LENGTH = 100;
 
+    @JsonCreator
     public Vocabulary  {
-        if (!isValidInput(english, indonesian)) {
-            throw new IllegalArgumentException(
-                    String.format("Invalid vocabulary entry: english='%s', indonesian='%s'",
-                            english, indonesian));
+        if (!isSearchTerm(english, indonesian)) {
+            WordValidator.validateWord(english, "English");
+            WordValidator.validateWord(indonesian, "Indonesian");
         }
-        english = TextUtils.sanitizeWord(english);
-        indonesian = TextUtils.sanitizeWord(indonesian);
-    }
-
-    private static boolean isValidInput(String english, String indonesian) {
-        return (isValidWord(english) && isValidWord(indonesian))
-                || (english.equals(SEARCH_DUMMY) ^ indonesian.equals(SEARCH_DUMMY));
-    }
-
-    private static boolean isValidWord(String word) {
-        return word != null
-                && !word.isBlank()
-                && word.length() <= MAX_WORD_LENGTH;
+        english = WordValidator.sanitizeWord(english);
+        indonesian = WordValidator.sanitizeWord(indonesian);
     }
 
     public static Vocabulary searchByLanguage(String word, Language language) {
-        if (word == null || word.isBlank()) {
-            throw new IllegalArgumentException("Search word cannot be null or empty");
-        }
+        WordValidator.validateWord(word, language.name());
         return language == Language.ENGLISH
                 ? new Vocabulary(word, SEARCH_DUMMY)
                 : new Vocabulary(SEARCH_DUMMY, word);
     }
 
+    @JsonIgnore
     public String getWord(Language language) {
         return language == Language.ENGLISH ? english : indonesian;
     }
 
+    @JsonIgnore
     public boolean isSearchTerm() {
         return english.equals(SEARCH_DUMMY) || indonesian.equals(SEARCH_DUMMY);
     }
+
+    private static boolean isSearchTerm(String english, String indonesian) {
+        return english.equals(SEARCH_DUMMY) ^ indonesian.equals(SEARCH_DUMMY);
+    }
+
+    @Override
+    public String toString() {
+        if (isSearchTerm()) {
+            return "SearchTerm["
+                    + (english.equals(SEARCH_DUMMY) ? indonesian : english)
+                    + "]";
+        }
+        return "Vocabulary[english=" + english + ", indonesian=" + indonesian + "]";
+    }
 }
+// TODO: Talk Later About deserialization and serialization
