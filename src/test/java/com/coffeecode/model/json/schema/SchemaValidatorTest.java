@@ -3,6 +3,7 @@ package com.coffeecode.model.json.schema;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,12 +12,16 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.coffeecode.model.json.exception.JsonValidationException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.networknt.schema.JsonSchema;
+import com.networknt.schema.ValidationMessage;
 
 @ExtendWith(MockitoExtension.class)
 class SchemaValidatorTest {
-    @Mock private JsonSchema mockSchema;
+
+    @Mock
+    private JsonSchema mockSchema;
     private SchemaValidator validator;
 
     @BeforeEach
@@ -26,11 +31,18 @@ class SchemaValidatorTest {
 
     @Test
     void validate_ValidJson_NoErrors() {
-        // Arrange
         JsonNode mockNode = mock(JsonNode.class);
         when(mockSchema.validate(mockNode)).thenReturn(Set.of());
-
-        // Act & Assert
         assertDoesNotThrow(() -> validator.validate(mockNode));
+    }
+
+    @Test
+    void validate_InvalidJson_ThrowsException() {
+        JsonNode mockNode = mock(JsonNode.class);
+        Set<ValidationMessage> errors = Set.of(mock(ValidationMessage.class));
+        when(mockSchema.validate(mockNode)).thenReturn(errors);
+
+        assertThrows(JsonValidationException.class,
+                () -> validator.validate(mockNode));
     }
 }
