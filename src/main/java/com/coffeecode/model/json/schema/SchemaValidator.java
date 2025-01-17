@@ -22,7 +22,7 @@ public class SchemaValidator {
         if (!errors.isEmpty()) {
             StringBuilder errorMessage = new StringBuilder("Validation errors: ");
             for (ValidationMessage error : errors) {
-                errorMessage.append(error.getMessage()).append("; ");
+                errorMessage.append(error.toString()).append("; ");
             }
             throw new JsonValidationException(errorMessage.toString());
         }
