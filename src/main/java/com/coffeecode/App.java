@@ -37,8 +37,11 @@ public class App {
 
             // Validate input
             if (!isValidInput(word)) {
-                logger.warn("Invalid input detected: {}", getValidationError(word));
-                return;
+                String validationError = getValidationError(word);
+                if (validationError != null) {
+                    logger.warn("Invalid input detected: {}", validationError);
+                    return;
+                }
             }
 
             // Proceed with translation
