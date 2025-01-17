@@ -8,8 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.coffeecode.model.record.Vocabulary;
-
 class DictionaryTest {
     private Dictionary dictionary;
 

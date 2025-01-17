@@ -8,7 +8,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.coffeecode.model.record.Vocabulary;
+import com.coffeecode.model.Vocabulary;
 
 public class JsonParser {
 

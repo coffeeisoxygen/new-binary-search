@@ -1,9 +1,7 @@
-package com.coffeecode.model.record;
+package com.coffeecode.model;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.coffeecode.model.Language;
 
 /**
  * Represents a bilingual vocabulary entry containing English and Indonesian
