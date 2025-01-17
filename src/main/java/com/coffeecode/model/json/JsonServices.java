@@ -122,7 +122,8 @@ public class JsonServices implements IJsonService {
     private void validateSchema(JsonNode jsonNode) throws JsonValidationException {
         Set<ValidationMessage> errors = schema.validate(jsonNode);
         if (!errors.isEmpty()) {
-            String errorMessages = errors.stream().map(ValidationMessage::getMessage)
+            String errorMessages = errors.stream()
+                    .map(ValidationMessage::getMessage)
                     .collect(Collectors.joining("; "));
             throw new JsonValidationException("Schema validation failed: " + errorMessages);
         }
