@@ -57,14 +57,17 @@ public class MainView extends JFrame {
 
     private void setupListeners() {
         inputField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
             public void insertUpdate(DocumentEvent e) {
                 updateTranslation();
             }
 
+            @Override
             public void removeUpdate(DocumentEvent e) {
                 updateTranslation();
             }
 
+            @Override
             public void changedUpdate(DocumentEvent e) {
                 updateTranslation();
             }
