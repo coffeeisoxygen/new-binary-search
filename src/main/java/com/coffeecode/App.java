@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import com.coffeecode.config.AppConfig;
 import com.coffeecode.model.core.Language;
+import com.coffeecode.model.search.SearchType;
 import com.coffeecode.service.DictionaryService;
 
 public class App {
@@ -16,34 +17,40 @@ public class App {
             AppConfig config = AppConfig.getDefault();
             DictionaryService service = new DictionaryService(config);
 
-            // Test core translation
-            testTranslation(service, "apple", Language.ENGLISH);
-            testTranslation(service, "kucing", Language.INDONESIAN);
+            // Demonstrate Binary Search with tracking
+            demonstrateSearch(service, "apple", Language.ENGLISH, SearchType.BINARY, true);
 
-            // Test error cases
-            testTranslation(service, "", Language.ENGLISH);
-            testTranslation(service, null, Language.INDONESIAN);
-            testTranslation(service, "nonexistent", Language.ENGLISH);
+            // Demonstrate Linear Search with tracking
+            service.setSearchStrategy(SearchType.LINEAR, true);
+            demonstrateSearch(service, "kucing", Language.INDONESIAN, SearchType.LINEAR, true);
+
+            // Demonstrate without tracking
+            service.setSearchStrategy(SearchType.BINARY, false);
+            demonstrateSearch(service, "book", Language.ENGLISH, SearchType.BINARY, false);
 
         } catch (Exception e) {
             logger.error("Application error: {}", e.getMessage());
         }
     }
 
-    private static void testTranslation(DictionaryService service,
+    private static void demonstrateSearch(DictionaryService service,
             String word,
-            Language language) {
-        try {
-            logger.info("Testing translation: '{}' ({})", word, language);
-            String result = service.translate(word, language);
+            Language language,
+            SearchType type,
+            boolean tracking) {
+        logger.info("Demonstrating {} search (tracked: {}) for: '{}' ({})",
+                type, tracking, word, language);
 
-            if (result != null) {
-                logger.info("Translation found: {} -> {}", word, result);
-            } else {
-                logger.warn("No translation found for: {}", word);
+        String result = service.translate(word, language);
+
+        if (result != null) {
+            logger.info("Translation found: {} -> {}", word, result);
+            if (tracking) {
+                service.getSearchSteps().forEach(step
+                        -> logger.info("  {}", step.getStepDescription()));
             }
-        } catch (Exception e) {
-            logger.error("Translation error for '{}': {}", word, e.getMessage());
+        } else {
+            logger.warn("No translation found for: {}", word);
         }
         logger.info("-------------------");
     }
