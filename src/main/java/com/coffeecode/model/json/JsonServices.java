@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +13,7 @@ import com.coffeecode.model.Vocabulary;
 import com.coffeecode.model.json.exception.JsonParsingException;
 import com.coffeecode.model.json.exception.JsonValidationException;
 import com.coffeecode.model.json.resources.ResourceLoader;
+import com.coffeecode.model.json.schema.SchemaValidator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,7 +23,7 @@ import com.networknt.schema.ValidationMessage;
 public class JsonServices implements IJsonService {
 
     private final ObjectMapper objectMapper;
-    private final JsonSchema schema;
+    private final SchemaValidator schemaValidator;
     private final AppConfig config;
     private final ResourceLoader resourceLoader;
     private static final Logger logger = LoggerFactory.getLogger(JsonServices.class);
@@ -34,7 +34,7 @@ public class JsonServices implements IJsonService {
             ResourceLoader resourceLoader) {
         this.config = config;
         this.objectMapper = objectMapper;
-        this.schema = schema;
+        this.schemaValidator = new SchemaValidator(schema);
         this.resourceLoader = resourceLoader;
     }
 
@@ -58,7 +58,7 @@ public class JsonServices implements IJsonService {
     public boolean isValid(String jsonContent) {
         try {
             JsonNode jsonNode = objectMapper.readTree(jsonContent);
-            Set<ValidationMessage> errors = schema.validate(jsonNode);
+            Set<ValidationMessage> errors = schemaValidator.validate(jsonNode);
             return errors.isEmpty();
         } catch (JsonProcessingException e) {
             logger.warn("JSON processing failed: {}", e.getMessage());
@@ -66,13 +66,19 @@ public class JsonServices implements IJsonService {
         }
     }
 
-    public List<Vocabulary> parseJson(String jsonContent) throws JsonParsingException {
+    public List<Vocabulary> parse(String jsonContent) throws JsonParsingException {
+
+        return parseJson(jsonContent);
+
+    }
+
+    private List<Vocabulary> parseJson(String jsonContent) throws JsonParsingException {
         try {
             // Step 1: Parse JSON structure
             JsonNode jsonNode = objectMapper.readTree(jsonContent);
 
             // Step 2: Validate against schema
-            validateSchema(jsonNode);
+            schemaValidator.validate(jsonNode);
 
             // Step 3: Map to objects
             List<Vocabulary> vocabularies = objectMapper.readValue(jsonContent, objectMapper
@@ -88,16 +94,6 @@ public class JsonServices implements IJsonService {
 
         } catch (JsonProcessingException e) {
             throw new JsonParsingException("Failed to parse JSON content", e);
-        }
-    }
-
-    private void validateSchema(JsonNode jsonNode) throws JsonValidationException {
-        Set<ValidationMessage> errors = schema.validate(jsonNode);
-        if (!errors.isEmpty()) {
-            String errorMessages = errors.stream()
-                    .map(ValidationMessage::getMessage)
-                    .collect(Collectors.joining("; "));
-            throw new JsonValidationException("Schema validation failed: " + errorMessages);
         }
     }
 

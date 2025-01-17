@@ -1,4 +1,4 @@
-package com.coffeecode.model.json;
+package com.coffeecode.model.json.resources;
 
 import java.io.InputStream;
 
@@ -7,8 +7,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import com.coffeecode.model.json.resources.ClassPathResourceLoader;
-import com.coffeecode.model.json.resources.ResourceLoader;
 
 @ExtendWith(MockitoExtension.class)
 class ResourceLoaderTest {
