@@ -9,7 +9,8 @@ import com.coffeecode.config.AppConfig;
 import com.coffeecode.model.Dictionary;
 import com.coffeecode.model.Language;
 import com.coffeecode.model.Vocabulary;
-import com.coffeecode.model.json.JsonServices;
+import com.coffeecode.model.json.IJsonService;
+import com.coffeecode.model.json.JsonServicesFactory;
 import com.coffeecode.model.search.BinarySearchStrategy;
 import com.coffeecode.model.search.SearchStrategy;
 import com.coffeecode.validation.WordValidator;
@@ -19,10 +20,10 @@ public class DictionaryService {
     private final Logger logger = LoggerFactory.getLogger(DictionaryService.class);
     private final Dictionary dictionary;
     private final SearchStrategy searchStrategy;
-    private final JsonServices jsonServices;
+    private final IJsonService jsonService;
 
     public DictionaryService(AppConfig config) {
-        this.jsonServices = new JsonServices(config);
+        this.jsonService = JsonServicesFactory.create(config);
         this.searchStrategy = new BinarySearchStrategy();
         this.dictionary = initializeDictionary();
     }
@@ -47,7 +48,7 @@ public class DictionaryService {
 
     private Dictionary initializeDictionary() {
         try {
-            List<Vocabulary> vocabularies = jsonServices.parseFile(null);
+            List<Vocabulary> vocabularies = jsonService.parseFile(null);
             logger.info("Dictionary initialized with {} words", vocabularies.size());
             return new Dictionary(vocabularies);
         } catch (Exception e) {
