@@ -30,7 +30,7 @@ public class App {
             Dictionary dictionary = new Dictionary(vocabularies);
             logger.info("Dictionary loaded with {} words", dictionary.size());
 
-            testSingleWordTranslation(dictionary, "cat", Language.ENGLISH);     // English -> Indonesian
+            testSingleWordTranslation(dictionary, "cat&#@", Language.ENGLISH);     // English -> Indonesian
             testSingleWordTranslation(dictionary, "masakan", Language.INDONESIAN); // Indonesian -> English
 
         } catch (JsonParsingException e) {

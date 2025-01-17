@@ -28,9 +28,26 @@ public class Dictionary {
         logger.info("Dictionary initialized with {} entries", vocabularies.size());
     }
 
+    private String sanitizeInput(String word) {
+        if (word == null) {
+            return null;
+        }
+        return word.trim()
+                // Convert to lowercase
+                .toLowerCase()
+                // Remove non-alphabetic characters except spaces and hyphens
+                .replaceAll("[^a-zA-Z\\s-]", "")
+                // Remove leading and trailing spaces
+                .replaceAll("\\s+", " ");
+    }
+
     public String translate(String word, Language sourceLanguage) {
-        if (word == null || word.isBlank()) {
-            logger.warn("Translation term cannot be null or empty");
+        // Sanitize input first
+        logger.info("Translating {} word: {}", sourceLanguage, word);
+        String sanitizedWord = sanitizeInput(word);
+        logger.info("Sanitized word: {}", sanitizedWord);
+        if (sanitizedWord == null || sanitizedWord.isBlank()) {
+            logger.warn("Translation term cannot be null or empty: {}", word);
             return null;
         }
 
@@ -38,7 +55,7 @@ public class Dictionary {
                 ? englishToIndonesian : indonesianToEnglish;
 
         int index = Collections.binarySearch(searchList,
-                Vocabulary.searchByLanguage(word, sourceLanguage),
+                Vocabulary.searchByLanguage(sanitizedWord, sourceLanguage),
                 (a, b) -> a.getWord(sourceLanguage).compareToIgnoreCase(b.getWord(sourceLanguage)));
 
         if (index >= 0) {
