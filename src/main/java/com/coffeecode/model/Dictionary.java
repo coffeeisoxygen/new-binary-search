@@ -21,49 +21,36 @@ public class Dictionary {
 
         // Sort for binary search
         Collections.sort(englishToIndonesian,
-                (a, b) -> a.english().compareToIgnoreCase(b.english()));
+                (a, b) -> a.getWord(Language.ENGLISH).compareToIgnoreCase(b.getWord(Language.ENGLISH)));
         Collections.sort(indonesianToEnglish,
-                (a, b) -> a.indonesian().compareToIgnoreCase(b.indonesian()));
+                (a, b) -> a.getWord(Language.INDONESIAN).compareToIgnoreCase(b.getWord(Language.INDONESIAN)));
 
         logger.info("Dictionary initialized with {} entries", vocabularies.size());
     }
 
-    // Add new method
     public String translate(String word, Language sourceLanguage) {
         if (word == null || word.isBlank()) {
             logger.warn("Translation term cannot be null or empty");
             return null;
         }
 
-        return switch (sourceLanguage) {
-            case ENGLISH ->
-                findIndonesian(word);
-            case INDONESIAN ->
-                findEnglish(word);
-        };
-    }
+        List<Vocabulary> searchList = sourceLanguage == Language.ENGLISH
+                ? englishToIndonesian : indonesianToEnglish;
 
-    private String findIndonesian(String english) {
-        int index = Collections.binarySearch(englishToIndonesian,
-                Vocabulary.searchByEnglish(english),
-                (a, b) -> a.english().compareToIgnoreCase(b.english()));
+        int index = Collections.binarySearch(searchList,
+                Vocabulary.searchByLanguage(word, sourceLanguage),
+                (a, b) -> a.getWord(sourceLanguage).compareToIgnoreCase(b.getWord(sourceLanguage)));
 
         if (index >= 0) {
-            logger.debug("Found Indonesian translation for: {}", english);
-            return englishToIndonesian.get(index).indonesian();
+            Vocabulary found = searchList.get(index);
+            String translation = sourceLanguage == Language.ENGLISH
+                    ? found.indonesian() : found.english();
+            logger.debug("Found translation for {} word '{}': '{}'",
+                    sourceLanguage, word, translation);
+            return translation;
         }
-        return null;
-    }
 
-    private String findEnglish(String indonesian) {
-        int index = Collections.binarySearch(indonesianToEnglish,
-                Vocabulary.searchByIndonesian(indonesian),
-                (a, b) -> a.indonesian().compareToIgnoreCase(b.indonesian()));
-
-        if (index >= 0) {
-            logger.debug("Found English translation for: {}", indonesian);
-            return indonesianToEnglish.get(index).english();
-        }
+        logger.debug("No translation found for {} word: {}", sourceLanguage, word);
         return null;
     }
 

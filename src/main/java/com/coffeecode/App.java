@@ -31,7 +31,7 @@ public class App {
             logger.info("Dictionary loaded with {} words", dictionary.size());
 
             testSingleWordTranslation(dictionary, "cat", Language.ENGLISH);     // English -> Indonesian
-            testSingleWordTranslation(dictionary, "kucing", Language.INDONESIAN); // Indonesian -> English
+            testSingleWordTranslation(dictionary, "masakan", Language.INDONESIAN); // Indonesian -> English
 
         } catch (JsonParsingException e) {
             logger.error("Failed to parse JSON: {}", e.getMessage());

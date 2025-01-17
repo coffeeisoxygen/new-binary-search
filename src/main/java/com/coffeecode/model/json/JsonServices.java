@@ -10,6 +10,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JsonServices implements IJsonService {
+
     private static final Logger logger = LoggerFactory.getLogger(JsonServices.class);
     private final ObjectMapper objectMapper;
 
@@ -20,7 +21,7 @@ public class JsonServices implements IJsonService {
     @Override
     public List<Vocabulary> parseJson(String jsonContent) throws JsonParsingException {
         logger.debug("Attempting to parse JSON content");
-        
+
         if (!validateJson(jsonContent)) {
             String message = "Invalid or empty JSON content";
             logger.error(message);
@@ -30,6 +31,7 @@ public class JsonServices implements IJsonService {
         try {
             List<Vocabulary> vocabularies = objectMapper.readValue(jsonContent,
                     objectMapper.getTypeFactory().constructCollectionType(List.class, Vocabulary.class));
+            validateJsonContent(vocabularies);
             logger.info("Successfully parsed {} vocabulary entries", vocabularies.size());
             return vocabularies;
         } catch (JsonProcessingException e) {
@@ -37,6 +39,37 @@ public class JsonServices implements IJsonService {
             logger.error(message, e);
             throw new JsonParsingException(message, e);
         }
+    }
+
+    private void validateJsonContent(List<Vocabulary> vocabularies) throws JsonParsingException {
+        if (vocabularies == null || vocabularies.isEmpty()) {
+            throw new JsonParsingException("Vocabulary list cannot be null or empty");
+        }
+
+        for (Vocabulary vocab : vocabularies) {
+            validateVocabularyFormat(vocab);
+        }
+    }
+
+    private void validateVocabularyFormat(Vocabulary vocab) throws JsonParsingException {
+        if (vocab == null) {
+            throw new JsonParsingException("Vocabulary entry cannot be null");
+        }
+
+        String english = vocab.english();
+        String indonesian = vocab.indonesian();
+
+        if (!isValidWord(english) || !isValidWord(indonesian)) {
+            throw new JsonParsingException(
+                    String.format("Invalid vocabulary entry: english='%s', indonesian='%s'",
+                            english, indonesian));
+        }
+    }
+
+    private boolean isValidWord(String word) {
+        return word != null
+                && !word.isBlank()
+                && word.matches("^[a-zA-Z\\s-]+$");
     }
 
     @Override
