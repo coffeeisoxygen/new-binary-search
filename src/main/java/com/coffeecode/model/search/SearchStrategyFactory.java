@@ -6,23 +6,12 @@ public class SearchStrategyFactory {
         throw new IllegalStateException("Utility class");
     }
 
-    public static SearchStrategy createStrategy(SearchType type, boolean tracked) {
-        SearchStrategy baseStrategy = switch (type) {
+    public static SearchStrategy createStrategy(SearchType type) {
+        return switch (type) {
             case BINARY ->
                 new BinarySearchStrategy();
             case LINEAR ->
                 new LinearSearchStrategy();
-        };
-
-        return tracked ? createTrackedStrategy(type, baseStrategy) : baseStrategy;
-    }
-
-    private static SearchStrategy createTrackedStrategy(SearchType type, SearchStrategy base) {
-        return switch (type) {
-            case BINARY ->
-                new TrackedBinarySearch(base);
-            case LINEAR ->
-                new TrackedLinearSearch(base);
         };
     }
 }

@@ -13,10 +13,8 @@ import com.coffeecode.model.core.Vocabulary;
 
 import com.coffeecode.model.json.service.IJsonService;
 import com.coffeecode.model.json.service.JsonServicesFactory;
-import com.coffeecode.model.search.SearchStrategy;
-import com.coffeecode.model.search.SearchStrategyFactory;
 import com.coffeecode.model.search.SearchType;
-import com.coffeecode.model.search.TrackedSearchStrategy;
+import com.coffeecode.model.search.context.SearchContext;
 import com.coffeecode.model.search.step.SearchStep;
 import com.coffeecode.validation.WordValidator;
 
@@ -24,39 +22,23 @@ public class DictionaryService {
 
     private final Logger logger = LoggerFactory.getLogger(DictionaryService.class);
     private final Dictionary dictionary;
-    private SearchStrategy searchStrategy;
     private final IJsonService jsonService;
-    private boolean isTracked;
-    private SearchType currentType;
+    private final SearchContext searchContext;
 
     public DictionaryService(AppConfig config) {
+        this.searchContext = new SearchContext();
         this.jsonService = JsonServicesFactory.create(config);
-        this.currentType = SearchType.BINARY;
-        this.isTracked = true;
-        this.searchStrategy = SearchStrategyFactory.createStrategy(currentType, isTracked);
         this.dictionary = initializeDictionary();
     }
 
     public void setSearchStrategy(SearchType type, boolean tracked) {
-        this.currentType = type;
-        this.isTracked = tracked;
-        this.searchStrategy = SearchStrategyFactory.createStrategy(type, tracked);
+        searchContext.setStrategy(type);
+        searchContext.setTracking(tracked);
         logger.info("Search strategy changed to: {} (tracked: {})", type, tracked);
     }
 
     public List<SearchStep> getSearchSteps() {
-        if (searchStrategy instanceof TrackedSearchStrategy tracked) {
-            return tracked.getSteps();
-        }
-        return Collections.emptyList();
-    }
-
-    public SearchType getCurrentStrategy() {
-        return currentType;
-    }
-
-    public boolean isTracked() {
-        return isTracked;
+        return searchContext.getSteps();
     }
 
     public String translate(String word, Language sourceLanguage) {
@@ -65,12 +47,8 @@ public class DictionaryService {
             String sanitizedWord = WordValidator.sanitizeWord(word);
             List<Vocabulary> searchList = dictionary.getSearchList(sourceLanguage);
 
-            return searchStrategy.findTranslation(
-                    searchList,
-                    sanitizedWord,
-                    sourceLanguage,
-                    sourceLanguage.opposite()
-            );
+            return searchContext.search(searchList, sanitizedWord,
+                    sourceLanguage, sourceLanguage.opposite());
         } catch (Exception e) {
             logger.error("Translation failed: {}", e.getMessage());
             throw new DictionaryServiceException("Translation failed", e);

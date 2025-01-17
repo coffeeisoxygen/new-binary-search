@@ -1,7 +1,9 @@
 package com.coffeecode.model.search.step;
 
-public class BinarySearchStep implements SearchStep {
+import com.coffeecode.model.search.SearchType;
 
+
+public class BinarySearchStep implements SearchStep {
     private final int low;
     private final int mid;
     private final int high;
@@ -21,7 +23,12 @@ public class BinarySearchStep implements SearchStep {
 
     @Override
     public String getStepDescription() {
-        return String.format("Checking index %d (low=%d, high=%d) : %s",
-                mid, low, high, currentWord);
+        return String.format("Checking index %d (low=%d, high=%d) : %s", 
+            mid, low, high, currentWord);
+    }
+
+    @Override
+    public SearchType getType() {
+        return SearchType.BINARY;
     }
 }
