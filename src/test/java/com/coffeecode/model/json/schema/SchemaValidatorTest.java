@@ -1,9 +1,10 @@
 package com.coffeecode.model.json.schema;
 
+import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,18 +32,38 @@ class SchemaValidatorTest {
 
     @Test
     void validate_ValidJson_NoErrors() {
+        // Arrange
         JsonNode mockNode = mock(JsonNode.class);
         when(mockSchema.validate(mockNode)).thenReturn(Set.of());
-        assertDoesNotThrow(() -> validator.validate(mockNode));
+        
+        // Act & Assert
+        Set<ValidationMessage> errors = validator.validate(mockNode);
+        assertTrue(errors.isEmpty());
     }
 
     @Test
     void validate_InvalidJson_ThrowsException() {
+        // Arrange
         JsonNode mockNode = mock(JsonNode.class);
-        Set<ValidationMessage> errors = Set.of(mock(ValidationMessage.class));
+        ValidationMessage mockError = mock(ValidationMessage.class);
+        when(mockError.getMessage()).thenReturn("Test error");
+        Set<ValidationMessage> errors = new HashSet<>();
+        errors.add(mockError);
+        when(mockSchema.validate(mockNode)).thenReturn(errors);
+        errors.add(mockError);
         when(mockSchema.validate(mockNode)).thenReturn(errors);
 
-        assertThrows(JsonValidationException.class,
-                () -> validator.validate(mockNode));
+        // Act & Assert
+        JsonValidationException exception = assertThrows(
+            JsonValidationException.class,
+            () -> validator.validate(mockNode)
+        );
+        assertTrue(exception.getMessage().contains("Test error"));
+    }
+
+    @Test
+    void validate_NullNode_ThrowsException() {
+        assertThrows(IllegalArgumentException.class, 
+            () -> validator.validate(null));
     }
 }

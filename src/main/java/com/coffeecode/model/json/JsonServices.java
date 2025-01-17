@@ -13,11 +13,11 @@ import com.coffeecode.model.Vocabulary;
 import com.coffeecode.model.json.exception.JsonParsingException;
 import com.coffeecode.model.json.exception.JsonValidationException;
 import com.coffeecode.model.json.resources.ResourceLoader;
+import com.coffeecode.model.json.schema.SchemaValidatable;
 import com.coffeecode.model.json.schema.SchemaValidator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.networknt.schema.JsonSchema;
 import com.networknt.schema.ValidationMessage;
 
 public class JsonServices implements IJsonService {
@@ -30,7 +30,7 @@ public class JsonServices implements IJsonService {
 
     public JsonServices(AppConfig config,
             ObjectMapper objectMapper,
-            JsonSchema schema,
+            SchemaValidatable schema,
             ResourceLoader resourceLoader) {
         this.config = config;
         this.objectMapper = objectMapper;

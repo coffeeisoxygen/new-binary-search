@@ -4,6 +4,7 @@ import com.coffeecode.config.AppConfig;
 import com.coffeecode.model.json.resources.ClassPathResourceLoader;
 import com.coffeecode.model.json.resources.ResourceLoader;
 import com.coffeecode.model.json.schema.DefaultSchemaLoader;
+import com.coffeecode.model.json.schema.JsonSchemaWrapper;
 import com.coffeecode.model.json.schema.SchemaLoader;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -22,7 +23,12 @@ public class JsonServicesFactory {
         ObjectMapper objectMapper = createObjectMapper();
         JsonSchema schema = schemaLoader.loadSchema(config.getSchemaPath());
 
-        return new JsonServices(config, objectMapper, schema, resourceLoader);
+        return new JsonServices(
+            config, 
+            objectMapper, 
+            new JsonSchemaWrapper(schema), 
+            resourceLoader
+        );
     }
 
     private static ObjectMapper createObjectMapper() {
