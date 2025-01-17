@@ -41,14 +41,45 @@ public class JsonServices implements IJsonService {
         this(AppConfig.getDefault());
     }
 
+    @Override
+    public List<Vocabulary> parseFile(String filePath) throws JsonParsingException {
+        String path = filePath != null ? filePath : config.getVocabularyPath();
+        try {
+            logger.debug("Reading file: {}", path);
+            InputStream inputStream = getClass().getResourceAsStream(path);
+            if (inputStream == null) {
+                throw new JsonParsingException("File not found in resources: " + path);
+            }
+            String jsonContent = new String(inputStream.readAllBytes());
+            return parseJson(jsonContent);
+        } catch (NoSuchFileException e) {
+            throw new JsonParsingException("File not found: " + path, e);
+        } catch (IOException e) {
+            throw new JsonParsingException("IO error reading " + path, e);
+        }
+    }
+
+    @Override
+    public boolean isValid(String jsonContent) {
+        try {
+            JsonNode jsonNode = objectMapper.readTree(jsonContent);
+            Set<ValidationMessage> errors = schema.validate(jsonNode);
+            return errors.isEmpty();
+        } catch (JsonProcessingException e) {
+            logger.warn("JSON processing failed: {}", e.getMessage());
+            return false;
+        }
+    }
+
     private JsonSchema loadSchema() {
         try {
             JsonSchemaFactory factory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V7);
             String schemaPath = config.getSchemaPath();
+            // Use getResourceAsStream with leading slash
             InputStream schemaStream = getClass().getResourceAsStream(schemaPath);
 
             if (schemaStream == null) {
-                throw new JsonParsingException("Schema not found: " + schemaPath);
+                throw new JsonParsingException("Schema not found in classpath: " + schemaPath);
             }
 
             return factory.getSchema(schemaStream);
@@ -64,20 +95,6 @@ public class JsonServices implements IJsonService {
                 .enable(DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES)
                 .enable(JsonParser.Feature.ALLOW_COMMENTS)
                 .enable(JsonParser.Feature.STRICT_DUPLICATE_DETECTION);
-    }
-
-    @Override
-    public List<Vocabulary> parseFile(String filePath) throws JsonParsingException {
-        String path = filePath != null ? filePath : config.getVocabularyPath();
-        try {
-            logger.debug("Reading file: {}", path);
-            String jsonContent = Files.readString(Path.of(path));
-            return parseJson(jsonContent);
-        } catch (NoSuchFileException e) {
-            throw new JsonParsingException("File not found: " + path, e);
-        } catch (IOException e) {
-            throw new JsonParsingException("IO error reading " + path, e);
-        }
     }
 
     private List<Vocabulary> parseJson(String jsonContent) throws JsonParsingException {
@@ -116,16 +133,5 @@ public class JsonServices implements IJsonService {
         }
     }
 
-    @Override
-    public boolean isValid(String jsonContent) {
-        try {
-            JsonNode jsonNode = objectMapper.readTree(jsonContent);
-            Set<ValidationMessage> errors = schema.validate(jsonNode);
-            return errors.isEmpty();
-        } catch (JsonProcessingException e) {
-            logger.warn("JSON processing failed: {}", e.getMessage());
-            return false;
-        }
-    }
 }
-// Todo : extends later 
+// Todo : extends later

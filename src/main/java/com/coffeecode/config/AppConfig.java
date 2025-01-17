@@ -2,27 +2,29 @@ package com.coffeecode.config;
 
 public class AppConfig {
 
-    // Default paths
-    private static final String DEFAULT_SCHEMA_PATH = "src/main/resources/schema/vocabulary-schema.json";
-    private static final String DEFAULT_VOCABULARY_PATH = "src/main/resources/vocabularies.json";
+    private static final String DEFAULT_BASE_PATH = "/";  // Default base path
+    private static final String DEFAULT_SCHEMA_PATH = "schema/vocabulary-schema.json";
+    private static final String DEFAULT_VOCABULARY_PATH = "data/vocabularies.json";
     private static final int DEFAULT_MAX_WORD_LENGTH = 100;
 
+    private final String basePath;
     private final String schemaPath;
     private final String vocabularyPath;
     private final int maxWordLength;
 
     private AppConfig(Builder builder) {
+        this.basePath = builder.basePath;
         this.schemaPath = builder.schemaPath;
         this.vocabularyPath = builder.vocabularyPath;
         this.maxWordLength = builder.maxWordLength;
     }
 
     public String getSchemaPath() {
-        return schemaPath;
+        return basePath + schemaPath;
     }
 
     public String getVocabularyPath() {
-        return vocabularyPath;
+        return basePath + vocabularyPath;
     }
 
     public int getMaxWordLength() {
@@ -31,9 +33,15 @@ public class AppConfig {
 
     public static class Builder {
 
+        private String basePath = DEFAULT_BASE_PATH;
         private String schemaPath = DEFAULT_SCHEMA_PATH;
         private String vocabularyPath = DEFAULT_VOCABULARY_PATH;
         private int maxWordLength = DEFAULT_MAX_WORD_LENGTH;
+
+        public Builder basePath(String basePath) {
+            this.basePath = basePath;
+            return this;
+        }
 
         public Builder schemaPath(String path) {
             this.schemaPath = path;
