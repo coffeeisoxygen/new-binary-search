@@ -12,6 +12,7 @@ import com.coffeecode.model.SearchStep;
 import com.coffeecode.model.TranslationResult;
 import com.coffeecode.model.json.JsonParser;
 import com.coffeecode.model.json.JsonServices;
+import com.fasterxml.jackson.core.JsonParseException;
 
 public class DictionaryService {
 
@@ -19,7 +20,7 @@ public class DictionaryService {
     private final Dictionary dictionary;
     private final List<SearchStep> searchSteps;
 
-    public DictionaryService() {
+    public DictionaryService() throws JsonParseException {
         JsonServices jsonServices = new JsonServices();
         JsonParser jsonParser = new JsonParser(jsonServices);
         this.searchSteps = new ArrayList<>();
@@ -27,8 +28,8 @@ public class DictionaryService {
             dictionary = new Dictionary(jsonParser.parseFile("src/main/resources/vocabularies.json"));
             logger.info("Dictionary initialized with {} words", dictionary.size());
         } catch (Exception e) {
-            logger.error("Failed to initialize dictionary: {}", e.getMessage());
-            throw new RuntimeException("Failed to initialize dictionary", e);
+            logger.error("Unexpected error during dictionary initialization: {}", e.getMessage());
+            throw new DictionaryServiceException("Unexpected error during dictionary initialization", e);
         }
     }
 
