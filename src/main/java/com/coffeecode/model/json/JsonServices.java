@@ -44,7 +44,7 @@ public class JsonServices implements IJsonService {
         String path = filePath != null ? filePath : config.getVocabularyPath();
         try {
             logger.debug("Reading file: {}", path);
-            InputStream inputStream = getClass().getResourceAsStream(path);
+            InputStream inputStream = getResourceAsStream(path);
             if (inputStream == null) {
                 throw new JsonParsingException("File not found in resources: " + path);
             }
@@ -74,7 +74,7 @@ public class JsonServices implements IJsonService {
             JsonSchemaFactory factory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V7);
             String schemaPath = config.getSchemaPath();
             // Use getResourceAsStream with leading slash
-            InputStream schemaStream = getClass().getResourceAsStream(schemaPath);
+            InputStream schemaStream = getResourceAsStream(schemaPath);
 
             if (schemaStream == null) {
                 throw new JsonParsingException("Schema not found in classpath: " + schemaPath);
@@ -94,7 +94,7 @@ public class JsonServices implements IJsonService {
                 .enable(JsonParser.Feature.STRICT_DUPLICATE_DETECTION);
     }
 
-    private List<Vocabulary> parseJson(String jsonContent) throws JsonParsingException {
+    List<Vocabulary> parseJson(String jsonContent) throws JsonParsingException {
         try {
             // Step 1: Parse JSON structure
             JsonNode jsonNode = objectMapper.readTree(jsonContent);
@@ -126,6 +126,11 @@ public class JsonServices implements IJsonService {
                     .collect(Collectors.joining("; "));
             throw new JsonValidationException("Schema validation failed: " + errorMessages);
         }
+    }
+
+    // Protected for testing
+    protected InputStream getResourceAsStream(String path) {
+        return getClass().getResourceAsStream(path);
     }
 
 }
