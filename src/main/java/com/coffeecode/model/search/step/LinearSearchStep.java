@@ -18,6 +18,11 @@ public class LinearSearchStep implements SearchStep {
     }
 
     @Override
+    public int getCurrentIndex() {
+        return index;
+    }
+
+    @Override
     public String getStepDescription() {
         return String.format("Checking index %d : %s", index, currentWord);
     }

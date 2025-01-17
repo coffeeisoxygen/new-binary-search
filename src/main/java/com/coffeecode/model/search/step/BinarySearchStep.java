@@ -22,9 +22,14 @@ public class BinarySearchStep implements SearchStep {
     }
 
     @Override
+    public int getCurrentIndex() {
+        return mid;
+    }
+
+    @Override
     public String getStepDescription() {
-        return String.format("Checking index %d (low=%d, high=%d) : %s", 
-            mid, low, high, currentWord);
+        return String.format("Checking index %d (mid=%d, low=%d, high=%d) : %s", 
+            mid, mid, low, high, currentWord);
     }
 
     @Override

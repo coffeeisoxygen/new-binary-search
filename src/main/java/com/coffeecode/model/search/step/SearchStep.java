@@ -7,5 +7,8 @@ public interface SearchStep {
     String getCurrentWord();
 
     String getStepDescription();
+
     SearchType getType();
+
+    int getCurrentIndex();
 }
