@@ -1,96 +1,50 @@
 package com.coffeecode;
 
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.coffeecode.config.AppConfig;
 import com.coffeecode.model.Language;
-import com.coffeecode.model.SearchStep;
-import com.coffeecode.model.TranslationResult;
-import com.coffeecode.viewmodel.DictionaryViewModel;
+import com.coffeecode.service.DictionaryService;
 
 public class App {
 
     private static final Logger logger = LoggerFactory.getLogger(App.class);
-    private static final int MAX_WORD_LENGTH = 100;
 
     public static void main(String[] args) {
         try {
-            DictionaryViewModel viewModel = new DictionaryViewModel();
+            AppConfig config = AppConfig.getDefault();
+            DictionaryService service = new DictionaryService(config);
 
-            // Test various input scenarios
-            testWithValidation(viewModel, "apple", Language.ENGLISH);
-            testWithValidation(viewModel, "kucing", Language.INDONESIAN); // Special chars
-            testWithValidation(viewModel, "", Language.ENGLISH);           // Empty
-            testWithValidation(viewModel, null, Language.INDONESIAN);      // Null
-            testWithValidation(viewModel, "a".repeat(150), Language.ENGLISH); // Too long
+            // Test core translation
+            testTranslation(service, "apple", Language.ENGLISH);
+            testTranslation(service, "kucing", Language.INDONESIAN);
+
+            // Test error cases
+            testTranslation(service, "", Language.ENGLISH);
+            testTranslation(service, null, Language.INDONESIAN);
+            testTranslation(service, "nonexistent", Language.ENGLISH);
 
         } catch (Exception e) {
             logger.error("Application error: {}", e.getMessage());
         }
     }
 
-    private static void testWithValidation(DictionaryViewModel viewModel, String word, Language language) {
+    private static void testTranslation(DictionaryService service,
+            String word,
+            Language language) {
         try {
-            logger.info("Testing input: '{}'", word);
+            logger.info("Testing translation: '{}' ({})", word, language);
+            String result = service.translate(word, language);
 
-            // Validate input
-            if (!isValidInput(word)) {
-                String validationError = getValidationError(word);
-                if (validationError != null) {
-                    logger.warn("Invalid input detected: {}", validationError);
-                    return;
-                }
+            if (result != null) {
+                logger.info("Translation found: {} -> {}", word, result);
+            } else {
+                logger.warn("No translation found for: {}", word);
             }
-
-            // Proceed with translation
-            viewModel.translate(word, language);
-            logTranslationResult(viewModel.getLastResult(), word);
-
         } catch (Exception e) {
-            logger.error("Error processing '{}': {}", word, e.getMessage());
-        }
-    }
-
-    private static boolean isValidInput(String word) {
-        return word != null
-                && !word.isBlank()
-                && word.length() <= MAX_WORD_LENGTH
-                && word.matches("[a-zA-Z\\s-]+");
-    }
-
-    private static String getValidationError(String word) {
-        if (word == null) {
-            return "Input cannot be null";
-        }
-        if (word.isBlank()) {
-            return "Input cannot be empty";
-        }
-        if (word.length() > MAX_WORD_LENGTH) {
-            return "Input too long";
-        }
-        if (!word.matches("[a-zA-Z\\s-]+")) {
-            return "Invalid characters";
-        }
-        return "Unknown validation error";
-    }
-
-    private static void logTranslationResult(TranslationResult result, String word) {
-        if (result != null && result.found()) {
-            logger.info("Translation found: {} -> {}", word, result.translation());
-            logSearchSteps(result.searchSteps());
-        } else {
-            logger.warn("No translation found for: {}", word);
+            logger.error("Translation error for '{}': {}", word, e.getMessage());
         }
         logger.info("-------------------");
-    }
-
-    private static void logSearchSteps(List<SearchStep> steps) {
-        logger.info("Search steps:");
-        steps.forEach(step
-                -> logger.info("Step: low={}, mid={}, high={}, current={}",
-                        step.low(), step.mid(), step.high(), step.currentWord())
-        );
     }
 }

@@ -1,49 +1,58 @@
 package com.coffeecode.service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.coffeecode.config.AppConfig;
 import com.coffeecode.model.Dictionary;
 import com.coffeecode.model.Language;
-import com.coffeecode.model.SearchStep;
-import com.coffeecode.model.TranslationResult;
-import com.coffeecode.model.json.JsonParser;
+import com.coffeecode.model.Vocabulary;
 import com.coffeecode.model.json.JsonServices;
-import com.fasterxml.jackson.core.JsonParseException;
+import com.coffeecode.model.search.BinarySearchStrategy;
+import com.coffeecode.model.search.SearchStrategy;
+import com.coffeecode.validation.WordValidator;
 
 public class DictionaryService {
 
-    private static final Logger logger = LoggerFactory.getLogger(DictionaryService.class);
+    private final Logger logger = LoggerFactory.getLogger(DictionaryService.class);
     private final Dictionary dictionary;
-    private final List<SearchStep> searchSteps;
+    private final SearchStrategy searchStrategy;
+    private final JsonServices jsonServices;
 
-    public DictionaryService() throws JsonParseException {
-        JsonServices jsonServices = new JsonServices();
-        JsonParser jsonParser = new JsonParser(jsonServices);
-        this.searchSteps = new ArrayList<>();
+    public DictionaryService(AppConfig config) {
+        this.jsonServices = new JsonServices(config);
+        this.searchStrategy = new BinarySearchStrategy();
+        this.dictionary = initializeDictionary();
+    }
+
+    public String translate(String word, Language sourceLanguage) {
         try {
-            dictionary = new Dictionary(jsonParser.parseFile("src/main/resources/vocabularies.json"));
-            logger.info("Dictionary initialized with {} words", dictionary.size());
+            WordValidator.validateWord(word, sourceLanguage.name());
+            String sanitizedWord = WordValidator.sanitizeWord(word);
+            List<Vocabulary> searchList = dictionary.getSearchList(sourceLanguage);
+
+            return searchStrategy.findTranslation(
+                    searchList,
+                    sanitizedWord,
+                    sourceLanguage,
+                    sourceLanguage.opposite()
+            );
         } catch (Exception e) {
-            logger.error("Unexpected error during dictionary initialization: {}", e.getMessage());
-            throw new DictionaryServiceException("Unexpected error during dictionary initialization", e);
+            logger.error("Translation failed: {}", e.getMessage());
+            throw new DictionaryServiceException("Translation failed", e);
         }
     }
 
-    public TranslationResult translate(String word, Language sourceLanguage) {
-        searchSteps.clear();
-        String translation = dictionary.translate(word, sourceLanguage, searchSteps);
-        return new TranslationResult(translation != null, translation, searchSteps);
-    }
-
-    public int getDictionarySize() {
-        return dictionary.size();
-    }
-
-    public List<SearchStep> getSearchSteps() {
-        return searchSteps;
+    private Dictionary initializeDictionary() {
+        try {
+            List<Vocabulary> vocabularies = jsonServices.parseFile(null);
+            logger.info("Dictionary initialized with {} words", vocabularies.size());
+            return new Dictionary(vocabularies);
+        } catch (Exception e) {
+            logger.error("Dictionary initialization failed: {}", e.getMessage());
+            throw new DictionaryServiceException("Failed to initialize dictionary", e);
+        }
     }
 }

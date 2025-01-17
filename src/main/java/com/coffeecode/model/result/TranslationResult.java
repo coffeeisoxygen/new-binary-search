@@ -1,4 +1,4 @@
-package com.coffeecode.model;
+package com.coffeecode.model.result;
 
 import java.util.List;
 
