@@ -1,4 +1,4 @@
-package com.coffeecode.model.json;
+package com.coffeecode.model.json.exception;
 
 public class JsonParsingException extends RuntimeException {
     public JsonParsingException(String message) {

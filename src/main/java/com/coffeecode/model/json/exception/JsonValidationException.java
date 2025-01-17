@@ -1,4 +1,4 @@
-package com.coffeecode.model.json;
+package com.coffeecode.model.json.exception;
 
 public class JsonValidationException extends JsonParsingException {
 

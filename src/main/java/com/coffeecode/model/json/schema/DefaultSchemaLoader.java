@@ -1,7 +1,9 @@
-package com.coffeecode.model.json;
+package com.coffeecode.model.json.schema;
 
 import java.io.InputStream;
 
+import com.coffeecode.model.json.exception.JsonParsingException;
+import com.coffeecode.model.json.resources.ResourceLoader;
 import com.networknt.schema.JsonSchema;
 import com.networknt.schema.JsonSchemaFactory;
 import com.networknt.schema.SpecVersion;

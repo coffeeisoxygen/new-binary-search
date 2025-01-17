@@ -3,6 +3,7 @@ package com.coffeecode.model.json;
 import java.util.List;
 
 import com.coffeecode.model.Vocabulary;
+import com.coffeecode.model.json.exception.JsonParsingException;
 
 /**
  * Interface for JSON processing services. Handles loading and parsing of

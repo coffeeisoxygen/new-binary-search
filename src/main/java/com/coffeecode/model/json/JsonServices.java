@@ -11,6 +11,9 @@ import org.slf4j.LoggerFactory;
 
 import com.coffeecode.config.AppConfig;
 import com.coffeecode.model.Vocabulary;
+import com.coffeecode.model.json.exception.JsonParsingException;
+import com.coffeecode.model.json.exception.JsonValidationException;
+import com.coffeecode.model.json.resources.ResourceLoader;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -63,28 +66,7 @@ public class JsonServices implements IJsonService {
         }
     }
 
-    // private JsonSchema loadSchema() {
-    //     try {
-    //         JsonSchemaFactory factory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V7);
-    //         String schemaPath = config.getSchemaPath();
-    //         // Use getResourceAsStream with leading slash
-    //         InputStream schemaStream = getResourceAsStream(schemaPath);
-    //         if (schemaStream == null) {
-    //             throw new JsonParsingException("Schema not found in classpath: " + schemaPath);
-    //         }
-    //         return factory.getSchema(schemaStream);
-    //     } catch (Exception e) {
-    //         logger.error("Failed to load JSON schema: {}", e.getMessage());
-    //         throw new JsonParsingException("Failed to load JSON schema", e);
-    //     }
-    // }
-    // private ObjectMapper configureObjectMapper() {
-    //     return new ObjectMapper().enable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)
-    //             .enable(DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES)
-    //             .enable(JsonParser.Feature.ALLOW_COMMENTS)
-    //             .enable(JsonParser.Feature.STRICT_DUPLICATE_DETECTION);
-    // }
-    List<Vocabulary> parseJson(String jsonContent) throws JsonParsingException {
+    public List<Vocabulary> parseJson(String jsonContent) throws JsonParsingException {
         try {
             // Step 1: Parse JSON structure
             JsonNode jsonNode = objectMapper.readTree(jsonContent);

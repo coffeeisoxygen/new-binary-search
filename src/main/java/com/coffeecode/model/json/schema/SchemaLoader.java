@@ -1,4 +1,4 @@
-package com.coffeecode.model.json;
+package com.coffeecode.model.json.schema;
 
 import com.networknt.schema.JsonSchema;
 

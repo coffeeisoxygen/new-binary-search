@@ -1,4 +1,4 @@
-package com.coffeecode.model.json;
+package com.coffeecode.model.json.resources;
 
 import java.io.InputStream;
 
