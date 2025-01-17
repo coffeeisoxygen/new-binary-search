@@ -1,5 +1,6 @@
 package com.coffeecode.model;
 
+import com.coffeecode.validation.ValidationException;
 import com.coffeecode.validation.WordValidator;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -18,13 +19,19 @@ public record Vocabulary(
     private static final String SEARCH_DUMMY = "__SEARCH__";
 
     @JsonCreator
-    public Vocabulary  {
+    public Vocabulary(String english, String indonesian) {
+        if (english == null) {
+            throw new ValidationException("English cannot be null or empty");
+        }
+        if (indonesian == null) {
+            throw new ValidationException("Indonesian cannot be null or empty");
+        }
         if (!isSearchTerm(english, indonesian)) {
             WordValidator.validateWord(english, "English");
             WordValidator.validateWord(indonesian, "Indonesian");
         }
-        english = WordValidator.sanitizeWord(english);
-        indonesian = WordValidator.sanitizeWord(indonesian);
+        this.english = SEARCH_DUMMY.equals(english) ? english : WordValidator.sanitizeWord(english);
+        this.indonesian = SEARCH_DUMMY.equals(indonesian) ? indonesian : WordValidator.sanitizeWord(indonesian);
     }
 
     public static Vocabulary searchByLanguage(String word, Language language) {

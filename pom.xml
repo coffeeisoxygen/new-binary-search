@@ -20,6 +20,7 @@
     <sl4j.version>2.0.16</sl4j.version>
     <jackson.version>2.15.2</jackson.version>
     <picocli.version>4.7.4</picocli.version>
+    <mockito.version>4.0.0</mockito.version>
   </properties>
 
   <dependencies>
@@ -70,6 +71,28 @@
       <groupId>com.networknt</groupId>
       <artifactId>json-schema-validator</artifactId>
       <version>1.0.72</version>
+    </dependency>
+
+    <!-- Mockito dependencies -->
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>${mockito.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-junit-jupiter</artifactId>
+      <version>${mockito.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-inline</artifactId>
+      <version>${mockito.version}</version>
+      <scope>test</scope>
     </dependency>
 
   </dependencies>
