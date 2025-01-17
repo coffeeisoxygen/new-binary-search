@@ -2,9 +2,7 @@ package com.coffeecode.model.json;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -90,8 +88,7 @@ public class JsonServices implements IJsonService {
     }
 
     private ObjectMapper configureObjectMapper() {
-        return new ObjectMapper()
-                .enable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)
+        return new ObjectMapper().enable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)
                 .enable(DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES)
                 .enable(JsonParser.Feature.ALLOW_COMMENTS)
                 .enable(JsonParser.Feature.STRICT_DUPLICATE_DETECTION);
@@ -106,9 +103,8 @@ public class JsonServices implements IJsonService {
             validateSchema(jsonNode);
 
             // Step 3: Map to objects
-            List<Vocabulary> vocabularies = objectMapper.readValue(jsonContent,
-                    objectMapper.getTypeFactory()
-                            .constructCollectionType(List.class, Vocabulary.class));
+            List<Vocabulary> vocabularies = objectMapper.readValue(jsonContent, objectMapper
+                    .getTypeFactory().constructCollectionType(List.class, Vocabulary.class));
 
             // Step 4: Validate result
             if (vocabularies.isEmpty()) {
@@ -126,8 +122,7 @@ public class JsonServices implements IJsonService {
     private void validateSchema(JsonNode jsonNode) throws JsonValidationException {
         Set<ValidationMessage> errors = schema.validate(jsonNode);
         if (!errors.isEmpty()) {
-            String errorMessages = errors.stream()
-                    .map(ValidationMessage::getMessage)
+            String errorMessages = errors.stream().map(ValidationMessage::getMessage)
                     .collect(Collectors.joining("; "));
             throw new JsonValidationException("Schema validation failed: " + errorMessages);
         }
