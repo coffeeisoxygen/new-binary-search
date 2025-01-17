@@ -16,7 +16,7 @@ import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.coffeecode.config.AppConfig;
-import com.coffeecode.model.Vocabulary;
+import com.coffeecode.model.core.Vocabulary;
 import com.coffeecode.model.json.resources.ResourceLoader;
 import com.coffeecode.model.json.schema.SchemaValidatable;
 import com.coffeecode.model.json.service.JsonServices;

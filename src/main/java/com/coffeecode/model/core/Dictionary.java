@@ -1,4 +1,4 @@
-package com.coffeecode.model;
+package com.coffeecode.model.core;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -1,4 +1,4 @@
-package com.coffeecode.model;
+package com.coffeecode.model.core;
 
 import com.coffeecode.validation.ValidationException;
 import com.coffeecode.validation.WordValidator;

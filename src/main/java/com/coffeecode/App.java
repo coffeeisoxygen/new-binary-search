@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.coffeecode.config.AppConfig;
-import com.coffeecode.model.Language;
+import com.coffeecode.model.core.Language;
 import com.coffeecode.service.DictionaryService;
 
 public class App {

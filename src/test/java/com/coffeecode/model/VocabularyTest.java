@@ -2,8 +2,9 @@ package com.coffeecode.model;
 
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
+import com.coffeecode.model.core.Language;
+import com.coffeecode.model.core.Vocabulary;
 import com.coffeecode.validation.ValidationException;
-import com.coffeecode.model.Language;
 
 class VocabularyTest {
 

@@ -7,7 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.coffeecode.config.AppConfig;
-import com.coffeecode.model.Vocabulary;
+import com.coffeecode.model.core.Vocabulary;
 import com.coffeecode.model.json.service.JsonServices;
 import com.coffeecode.model.json.service.JsonServicesFactory;
 

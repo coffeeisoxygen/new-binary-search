@@ -1,4 +1,4 @@
-package com.coffeecode.model;
+package com.coffeecode.model.core;
 
 public enum Language {
     ENGLISH, INDONESIAN;

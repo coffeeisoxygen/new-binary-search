@@ -6,13 +6,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.coffeecode.config.AppConfig;
-import com.coffeecode.model.Dictionary;
-import com.coffeecode.model.Language;
-import com.coffeecode.model.Vocabulary;
+import com.coffeecode.model.core.Dictionary;
+import com.coffeecode.model.core.Language;
+import com.coffeecode.model.core.Vocabulary;
+
+
 import com.coffeecode.model.json.service.IJsonService;
 import com.coffeecode.model.json.service.JsonServicesFactory;
 import com.coffeecode.model.search.BinarySearchStrategy;
 import com.coffeecode.model.search.SearchStrategy;
+
 import com.coffeecode.validation.WordValidator;
 
 public class DictionaryService {

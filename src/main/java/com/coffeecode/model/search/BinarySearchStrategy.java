@@ -1,9 +1,10 @@
 package com.coffeecode.model.search;
 
 import java.util.List;
+import com.coffeecode.model.core.Language;
+import com.coffeecode.model.core.Vocabulary;
 
-import com.coffeecode.model.Language;
-import com.coffeecode.model.Vocabulary;
+
 
 public class BinarySearchStrategy implements SearchStrategy {
 
@@ -22,10 +23,10 @@ public class BinarySearchStrategy implements SearchStrategy {
                     .compareToIgnoreCase(word);
 
             if (comparison < 0) {
-                low = mid + 1; 
-            }else if (comparison > 0) {
-                high = mid - 1; 
-            }else {
+                low = mid + 1;
+            } else if (comparison > 0) {
+                high = mid - 1;
+            } else {
                 return midVocab.getWord(targetLanguage);
             }
         }

@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.coffeecode.config.AppConfig;
-import com.coffeecode.model.Vocabulary;
+import com.coffeecode.model.core.Vocabulary;
 import com.coffeecode.model.json.exception.JsonParsingException;
 import com.coffeecode.model.json.exception.JsonValidationException;
 import com.coffeecode.model.json.resources.ResourceLoader;
