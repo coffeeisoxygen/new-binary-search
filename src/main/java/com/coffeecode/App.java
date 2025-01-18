@@ -9,9 +9,9 @@ import com.coffeecode.config.AppConfig;
 import com.coffeecode.gui.MainFrame;
 import com.coffeecode.service.DictionaryService;
 import com.coffeecode.viewmodel.SidebarViewModel;
+import com.coffeecode.viewmodel.VisualizationViewModel;
 
 public class App {
-
     private static final Logger logger = LoggerFactory.getLogger(App.class);
 
     public static void main(String[] args) {
@@ -34,11 +34,12 @@ public class App {
 
         // Initialize view models
         SidebarViewModel sidebarViewModel = new SidebarViewModel(dictionaryService);
+        VisualizationViewModel visualizationViewModel = new VisualizationViewModel();
 
         // Launch UI
         SwingUtilities.invokeLater(() -> {
             try {
-                MainFrame mainFrame = new MainFrame(sidebarViewModel);
+                MainFrame mainFrame = new MainFrame(sidebarViewModel, visualizationViewModel);
                 mainFrame.setVisible(true);
                 logger.info("Application UI initialized successfully");
             } catch (Exception e) {
@@ -51,6 +52,5 @@ public class App {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             logger.info("Application shutting down...");
             // Add cleanup code here if needed
-        }));
-    }
+        }));    }
 }

@@ -48,6 +48,8 @@ public class SidebarHandler {
     private void setupListeners() {
         panel.addSearchListener(this::performSearch);
         panel.addClearListener(this::clearFields);
+        panel.addWordValidationListener(this::validateAll);
+        panel.addLanguageValidationListener(this::validateAll);
     }
 
     private void setupBindings() {

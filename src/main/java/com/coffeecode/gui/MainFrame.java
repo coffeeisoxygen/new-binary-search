@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import com.coffeecode.gui.handler.SidebarHandler;
 import com.coffeecode.viewmodel.SidebarViewModel;
+import com.coffeecode.viewmodel.VisualizationViewModel;
 
 public class MainFrame extends JFrame {
 
@@ -19,13 +20,13 @@ public class MainFrame extends JFrame {
     private final VisualizationPanel visualizationPanel;
     private final SidebarHandler sidebarHandler;
 
-    public MainFrame(SidebarViewModel sidebarViewModel) {
+    public MainFrame(SidebarViewModel sidebarViewModel, VisualizationViewModel visualizationViewModel) {
         // Frame setup
         setupFrame();
 
         // Initialize panels
         this.sidebarPanel = new SidebarPanel(250);
-        this.visualizationPanel = new VisualizationPanel();
+        this.visualizationPanel = new VisualizationPanel(visualizationViewModel);
         this.statisticsPanel = new StatisticsPanel();
 
         // Initialize handlers
