@@ -12,7 +12,9 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -41,7 +43,7 @@ public class SidebarPanel extends JPanel {
     // UI Components - Controls
     private final JButton searchButton;
     private final JButton clearButton;
-    private final JTextField errorInputInfo;
+    private final JTextArea errorInputInfo;
 
     public SidebarPanel(int width) {
         // Initialize components
@@ -102,13 +104,17 @@ public class SidebarPanel extends JPanel {
         add(component);
     }
 
-    private JTextField createErrorInputField(int width) {
-        JTextField field = new JTextField();
-        field.setEditable(false);
-        field.setPreferredSize(new Dimension(width, COMPONENT_HEIGHT * 2));
-        field.setVisible(true); // Always visible
-        field.setText(" "); // Initialize with space to maintain height
-        return field;
+    private JTextArea createErrorInputField(int width) {
+        JTextArea area = new JTextArea();
+        area.setEditable(false);
+        area.setLineWrap(true);
+        area.setWrapStyleWord(true);
+        area.setBackground(UIManager.getColor("TextField.background"));
+        area.setBorder(BorderFactory.createEtchedBorder());
+        area.setPreferredSize(new Dimension(width, COMPONENT_HEIGHT * 3)); // Increased height
+        area.setVisible(true);
+        area.setText(" "); // Initialize with space
+        return area;
     }
 
     private JTextField createTextField() {
