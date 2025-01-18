@@ -36,4 +36,13 @@ public class BinarySearchStep implements SearchStep {
     public SearchType getType() {
         return SearchType.BINARY;
     }
+
+    // Add these new getter methods
+    public int getLow() {
+        return low;
+    }
+
+    public int getHigh() {
+        return high;
+    }
 }

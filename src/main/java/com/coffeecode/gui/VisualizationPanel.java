@@ -11,6 +11,8 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
 
+import com.coffeecode.gui.components.SearchVisualizerComponent;
+import com.coffeecode.model.search.step.SearchStep;
 import com.coffeecode.viewmodel.VisualizationViewModel;
 
 public class VisualizationPanel extends JPanel {
@@ -18,6 +20,7 @@ public class VisualizationPanel extends JPanel {
     private final VisualizationViewModel viewModel;
     private final JTextField resultField;
     private final JTextField indexField;
+    private final SearchVisualizerComponent visualizer;
 
     public VisualizationPanel(VisualizationViewModel viewModel) {
         this.viewModel = viewModel;
@@ -39,6 +42,10 @@ public class VisualizationPanel extends JPanel {
         visualPanel.setPreferredSize(new Dimension(400, 200));
         add(visualPanel, BorderLayout.CENTER);
 
+        // Initialize visualizer
+        visualizer = new SearchVisualizerComponent();
+        visualPanel.add(visualizer);
+
         // Result and Index fields
         resultField = createTextField();
         indexField = createTextField();
@@ -51,6 +58,13 @@ public class VisualizationPanel extends JPanel {
 
         // Bind view model
         bindViewModel();
+
+        // Update the visualizer when steps change
+        viewModel.addPropertyChangeListener(evt -> {
+            if ("currentStep".equals(evt.getPropertyName())) {
+                visualizer.updateStep((SearchStep) evt.getNewValue());
+            }
+        });
     }
 
     private JTextField createTextField() {
@@ -61,15 +75,16 @@ public class VisualizationPanel extends JPanel {
 
     private void bindViewModel() {
         viewModel.addPropertyChangeListener(evt -> {
-            switch (evt.getPropertyName()) {
-                case "result" -> {
-                    resultField.setText((String) evt.getNewValue());
-                    resultField.setEnabled(!((String) evt.getNewValue()).isEmpty());
-                }
-                case "index" -> {
-                    indexField.setText((String) evt.getNewValue());
-                    indexField.setEnabled(!((String) evt.getNewValue()).isEmpty());
-                }
+            String propertyName = evt.getPropertyName();
+            if ("result".equals(propertyName)) {
+                resultField.setText((String) evt.getNewValue());
+                resultField.setEnabled(!((String) evt.getNewValue()).isEmpty());
+            } else if ("index".equals(propertyName)) {
+                indexField.setText((String) evt.getNewValue());
+                indexField.setEnabled(!((String) evt.getNewValue()).isEmpty());
+            } else {
+                // Default case
+                System.out.println("Unknown property: " + propertyName);
             }
         });
     }
