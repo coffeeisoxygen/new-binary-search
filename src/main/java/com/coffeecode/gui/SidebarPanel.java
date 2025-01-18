@@ -50,7 +50,9 @@ public class SidebarPanel extends JPanel {
         trackingCheckbox = new JCheckBox("Enable Step Tracking");
         wordInput = createTextField();
         resultField = createTextField();
+        resultField.setEditable(false);
         indexField = createTextField();
+        indexField.setEditable(false);
         searchButton = createButton("Search", width);
         clearButton = createButton("Clear", width);
         errorInputInfo = createErrorInputField(width);
@@ -77,13 +79,13 @@ public class SidebarPanel extends JPanel {
         // Search Configuration
         addLabeledComponent("Search Algorithm", searchTypeSelector, width);
         add(trackingCheckbox);
+        add(searchButton);
 
         // Results
         addLabeledComponent("Translation", resultField, width);
         addLabeledComponent("Found at Index", indexField, width);
 
         // Control Buttons
-        add(searchButton);
         addVerticalSpace(VERTICAL_GAP);
         add(clearButton);
     }
@@ -93,6 +95,8 @@ public class SidebarPanel extends JPanel {
         JLabel label = new JLabel(labelText);
         label.setPreferredSize(new Dimension(width, COMPONENT_HEIGHT));
         component.setPreferredSize(new Dimension(width, COMPONENT_HEIGHT));
+        label.setAlignmentX(LEFT_ALIGNMENT);
+        component.setAlignmentX(LEFT_ALIGNMENT);
         add(label);
         add(component);
     }
@@ -115,7 +119,7 @@ public class SidebarPanel extends JPanel {
         Dimension size = new Dimension(width, COMPONENT_HEIGHT);
         button.setPreferredSize(size);
         button.setMaximumSize(size);
-        button.setAlignmentX(CENTER_ALIGNMENT);
+        button.setAlignmentX(LEFT_ALIGNMENT);
         return button;
     }
 
