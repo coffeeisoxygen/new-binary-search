@@ -54,4 +54,8 @@ public class MainFrame extends JFrame {
         mainContentPanel.add(statisticsPanel, BorderLayout.SOUTH);
         add(mainContentPanel, BorderLayout.CENTER);
     }
+
+    public void initializeVisualization(int size) {
+        visualizationPanel.initializeSize(size);
+    }
 }

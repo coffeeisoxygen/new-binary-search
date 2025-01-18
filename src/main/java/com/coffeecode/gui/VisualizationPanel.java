@@ -67,6 +67,11 @@ public class VisualizationPanel extends JPanel {
         });
     }
 
+    public void initializeSize(int size) {
+        visualizer.setDictionarySize(size); // Call visualizer directly
+        viewModel.setSize(size);
+    }
+
     private JTextField createTextField() {
         JTextField field = new JTextField(10);
         field.setEditable(false);
@@ -76,15 +81,18 @@ public class VisualizationPanel extends JPanel {
     private void bindViewModel() {
         viewModel.addPropertyChangeListener(evt -> {
             String propertyName = evt.getPropertyName();
-            if ("result".equals(propertyName)) {
-                resultField.setText((String) evt.getNewValue());
-                resultField.setEnabled(!((String) evt.getNewValue()).isEmpty());
-            } else if ("index".equals(propertyName)) {
-                indexField.setText((String) evt.getNewValue());
-                indexField.setEnabled(!((String) evt.getNewValue()).isEmpty());
-            } else {
-                // Default case
-                System.out.println("Unknown property: " + propertyName);
+            switch (propertyName) {
+                case "result" -> {
+                    resultField.setText((String) evt.getNewValue());
+                    resultField.setEnabled(!((String) evt.getNewValue()).isEmpty());
+                }
+                case "index" -> {
+                    indexField.setText((String) evt.getNewValue());
+                    indexField.setEnabled(!((String) evt.getNewValue()).isEmpty());
+                }
+                case "size" -> visualizer.setDictionarySize((Integer) evt.getNewValue());
+                case "currentStep" -> visualizer.updateStep((SearchStep) evt.getNewValue());
+                default -> System.out.println("Unknown property: " + propertyName);
             }
         });
     }

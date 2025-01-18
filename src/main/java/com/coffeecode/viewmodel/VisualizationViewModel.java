@@ -3,20 +3,27 @@ package com.coffeecode.viewmodel;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
-public class VisualizationViewModel {
+import com.coffeecode.model.search.step.SearchStep;
 
-    private final PropertyChangeSupport changes = new PropertyChangeSupport(this);
-    private String result = "";
-    private String index = "";
+public class VisualizationViewModel {
+    private final PropertyChangeSupport propertyChangeSupport;
+    private String result;
+    private String index;
+    private int size;
+    private SearchStep currentStep;
+
+    public VisualizationViewModel() {
+        this.propertyChangeSupport = new PropertyChangeSupport(this);
+    }
 
     public String getResult() {
         return result;
     }
 
     public void setResult(String result) {
-        String oldValue = this.result;
+        String oldResult = this.result;
         this.result = result;
-        changes.firePropertyChange("result", oldValue, result);
+        propertyChangeSupport.firePropertyChange("result", oldResult, result);
     }
 
     public String getIndex() {
@@ -24,16 +31,36 @@ public class VisualizationViewModel {
     }
 
     public void setIndex(String index) {
-        String oldValue = this.index;
+        String oldIndex = this.index;
         this.index = index;
-        changes.firePropertyChange("index", oldValue, index);
+        propertyChangeSupport.firePropertyChange("index", oldIndex, index);
+    }
+
+    public void setSize(int size) {
+        int oldSize = this.size;
+        this.size = size;
+        propertyChangeSupport.firePropertyChange("size", oldSize, size);
+    }
+
+    public int getSize() {
+        return size;
+    }
+
+    public void setCurrentStep(SearchStep step) {
+        SearchStep oldStep = this.currentStep;
+        this.currentStep = step;
+        propertyChangeSupport.firePropertyChange("currentStep", oldStep, step);
+    }
+
+    public SearchStep getCurrentStep() {
+        return currentStep;
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
-        changes.addPropertyChangeListener(listener);
+        propertyChangeSupport.addPropertyChangeListener(listener);
     }
 
     public void removePropertyChangeListener(PropertyChangeListener listener) {
-        changes.removePropertyChangeListener(listener);
+        propertyChangeSupport.removePropertyChangeListener(listener);
     }
 }

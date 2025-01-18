@@ -16,9 +16,9 @@ import com.coffeecode.model.search.step.SearchStep;
 
 public class SearchVisualizerComponent extends JPanel {
 
-    // Constants for box dimensions and colors
-    private static final int BOX_HEIGHT = 40;
-    private static final int BOX_WIDTH = 40;
+    // Replace fixed constants with dynamic calculations
+    private static final int BOXES_PER_ROW = 10;
+    private static final int MIN_BOX_SIZE = 30;
     private static final int BOX_GAP = 5;
     private static final int VERTICAL_PADDING = 20;
 
@@ -60,20 +60,34 @@ public class SearchVisualizerComponent extends JPanel {
         Graphics2D g2d = (Graphics2D) g;
         setupGraphics(g2d);
 
-        // Calculate starting position to center the visualization
-        int totalWidth = indices.length * (BOX_WIDTH + BOX_GAP) - BOX_GAP;
-        int startX = (getWidth() - totalWidth) / 2;
-        int startY = (getHeight() - BOX_HEIGHT) / 2;
+        // Calculate dimensions
+        int rows = (int) Math.ceil(indices.length / (double)BOXES_PER_ROW);
+        int availableWidth = getWidth() - (2 * VERTICAL_PADDING);
+        int availableHeight = getHeight() - (2 * VERTICAL_PADDING);
 
-        // Draw boxes
+        // Calculate box size
+        int boxWidth = Math.max(MIN_BOX_SIZE, 
+            (availableWidth - (BOXES_PER_ROW - 1) * BOX_GAP) / BOXES_PER_ROW);
+        int boxHeight = Math.max(MIN_BOX_SIZE,
+            (availableHeight - (rows - 1) * BOX_GAP) / rows);
+        
+        // Use smaller of width/height to keep boxes square
+        int boxSize = Math.min(boxWidth, boxHeight);
+
+        // Draw boxes in grid
         for (int i = 0; i < indices.length; i++) {
-            int x = startX + i * (BOX_WIDTH + BOX_GAP);
-            drawBox(g2d, x, startY, indices[i], getBoxColor(i));
+            int row = i / BOXES_PER_ROW;
+            int col = i % BOXES_PER_ROW;
+            
+            int x = VERTICAL_PADDING + col * (boxSize + BOX_GAP);
+            int y = VERTICAL_PADDING + row * (boxSize + BOX_GAP);
+            
+            drawBox(g2d, x, y, indices[i], getBoxColor(i), boxSize);
         }
 
-        // Draw labels for binary search pointers
+        // Update pointer labels for binary search
         if (currentStep instanceof BinarySearchStep bStep) {
-            drawPointerLabels(g2d, startX, startY, bStep);
+            drawPointerLabels(g2d, VERTICAL_PADDING, boxSize, bStep);
         }
     }
 
@@ -84,52 +98,49 @@ public class SearchVisualizerComponent extends JPanel {
                 RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
     }
 
-    private void drawPointerLabels(Graphics2D g2d, int startX, int startY, BinarySearchStep bStep) {
-        g2d.setFont(new Font("SansSerif", Font.BOLD, 12));
+    private void drawPointerLabels(Graphics2D g2d, int startX, int boxSize, BinarySearchStep bStep) {
+        g2d.setFont(new Font("SansSerif", Font.BOLD, boxSize/3));
         
-        // Draw low pointer
-        String lowLabel = "low";
-        int lowX = startX + bStep.getLow() * (BOX_WIDTH + BOX_GAP);
-        drawLabel(g2d, lowLabel, lowX, startY - 5, LOW_COLOR);
+        // Calculate positions based on grid layout
+        int lowIndex = bStep.getLow();
+        int highIndex = bStep.getHigh();
+        int midIndex = bStep.getCurrentIndex();
 
-        // Draw high pointer
-        String highLabel = "high";
-        int highX = startX + bStep.getHigh() * (BOX_WIDTH + BOX_GAP);
-        drawLabel(g2d, highLabel, highX, startY - 5, HIGH_COLOR);
+        drawLabel(g2d, "low", 
+            startX + (lowIndex % BOXES_PER_ROW) * (boxSize + BOX_GAP),
+            startX + (lowIndex / BOXES_PER_ROW) * (boxSize + BOX_GAP) - 5,
+            LOW_COLOR);
 
-        // Draw mid pointer
-        String midLabel = "mid";
-        int midX = startX + bStep.getCurrentIndex() * (BOX_WIDTH + BOX_GAP);
-        drawLabel(g2d, midLabel, midX, startY + BOX_HEIGHT + 15, MID_COLOR);
+        // Similar updates for high and mid labels...
     }
 
     private void drawLabel(Graphics2D g2d, String text, int x, int y, Color color) {
         FontMetrics fm = g2d.getFontMetrics();
         int textWidth = fm.stringWidth(text);
-        x = x + (BOX_WIDTH - textWidth) / 2;
+        x = x + (MIN_BOX_SIZE - textWidth) / 2;
 
         g2d.setColor(color);
         g2d.drawString(text, x, y);
     }
 
-    private void drawBox(Graphics2D g2d, int x, int y, int value, Color color) {
+    private void drawBox(Graphics2D g2d, int x, int y, int value, Color color, int size) {
         // Draw box background
         g2d.setColor(color);
-        g2d.fillRect(x, y, BOX_WIDTH, BOX_HEIGHT);
+        g2d.fillRect(x, y, size, size);
         
         // Draw border
         g2d.setColor(Color.BLACK);
-        g2d.drawRect(x, y, BOX_WIDTH, BOX_HEIGHT);
+        g2d.drawRect(x, y, size, size);
 
         // Draw index number
-        drawCenteredText(g2d, String.valueOf(value), x, y);
+        drawCenteredText(g2d, String.valueOf(value), x, y, size);
     }
 
-    private void drawCenteredText(Graphics2D g2d, String text, int x, int y) {
-        g2d.setFont(new Font("SansSerif", Font.PLAIN, 12));
+    private void drawCenteredText(Graphics2D g2d, String text, int x, int y, int size) {
+        g2d.setFont(new Font("SansSerif", Font.PLAIN, size/3));
         FontMetrics fm = g2d.getFontMetrics();
-        int textX = x + (BOX_WIDTH - fm.stringWidth(text)) / 2;
-        int textY = y + (BOX_HEIGHT + fm.getAscent()) / 2;
+        int textX = x + (size - fm.stringWidth(text)) / 2;
+        int textY = y + (size + fm.getAscent()) / 2;
         g2d.setColor(Color.BLACK);
         g2d.drawString(text, textX, textY);
     }

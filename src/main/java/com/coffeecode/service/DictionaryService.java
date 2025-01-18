@@ -58,6 +58,10 @@ public class DictionaryService {
         }
     }
 
+    public int getDictionarySize() {
+        return dictionary.size();
+    }
+
     private void validateLanguages(Language source, Language target) {
         if (source == target) {
             throw new ValidationException("Source and target languages must be different");
