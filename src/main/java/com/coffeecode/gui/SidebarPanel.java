@@ -1,5 +1,6 @@
 package com.coffeecode.gui;
 
+import java.awt.Color;
 import java.awt.Dimension;
 
 import javax.swing.BorderFactory;
@@ -105,6 +106,8 @@ public class SidebarPanel extends JPanel {
         JTextField field = new JTextField();
         field.setEditable(false);
         field.setPreferredSize(new Dimension(width, COMPONENT_HEIGHT * 2));
+        field.setVisible(true); // Always visible
+        field.setText(" "); // Initialize with space to maintain height
         return field;
     }
 
@@ -125,33 +128,58 @@ public class SidebarPanel extends JPanel {
 
     // Configuration Methods
     private void configureComponents() {
+        // Configure word input validation
         wordInput.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
-                validateInput();
+                validateAllInputs();
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                validateInput();
+                validateAllInputs();
             }
 
             @Override
             public void changedUpdate(DocumentEvent e) {
-                validateInput();
-            }
-
-            private void validateInput() {
-                String text = wordInput.getText();
-                if (text == null || text.isBlank()) {
-                    showError("Word cannot be empty");
-                } else if (!text.matches("[a-zA-Z\\s-]+")) {
-                    showError("Word can only contain letters, spaces and hyphens");
-                } else {
-                    hideError();
-                }
+                validateAllInputs();
             }
         });
+
+        // Add language combo box listeners
+        sourceLanguageSelector.addActionListener(e -> validateAllInputs());
+        targetLanguageSelector.addActionListener(e -> validateAllInputs());
+    }
+
+    private void validateAllInputs() {
+        StringBuilder errorMessage = new StringBuilder();
+
+        // Validate word input
+        String text = wordInput.getText();
+        if (text == null || text.isBlank()) {
+            errorMessage.append("Word cannot be empty");
+        } else if (!text.matches("[a-zA-Z\\s-]+")) {
+            errorMessage.append("Word can only contain letters, spaces and hyphens");
+        }
+
+        // Validate language selections
+        Language source = getSourceLanguage();
+        Language target = getTargetLanguage();
+        if (source != null && target != null && source == target) {
+            if (errorMessage.length() > 0) {
+                errorMessage.append("\n");
+            }
+            errorMessage.append("Source and target languages must be different");
+        }
+
+        // Always show the error info field, just update its text
+        if (errorMessage.length() > 0) {
+            showError(errorMessage.toString());
+        } else {
+            // Don't hide the field, just clear the text
+            errorInputInfo.setText(" "); // Space to maintain height
+            errorInputInfo.setForeground(Color.BLACK);
+        }
     }
 
     // Public API Methods - Getters and Setters
@@ -217,11 +245,14 @@ public class SidebarPanel extends JPanel {
     // Public API Methods - UI State Management
     public void showError(String message) {
         errorInputInfo.setText(message);
-        errorInputInfo.setVisible(true);
+        errorInputInfo.setForeground(Color.RED);
+        errorInputInfo.setVisible(true); // Always visible
     }
 
     public void hideError() {
-        errorInputInfo.setVisible(false);
+        errorInputInfo.setText(" "); // Space to maintain height
+        errorInputInfo.setForeground(Color.BLACK);
+        // Don't hide the component
     }
 
     // Event Registration Methods
