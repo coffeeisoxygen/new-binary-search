@@ -18,285 +18,255 @@ import javax.swing.event.DocumentListener;
 
 import com.coffeecode.model.core.Language;
 import com.coffeecode.model.search.SearchType;
-import com.coffeecode.validation.ValidationException;
-import com.coffeecode.viewmodel.SidebarViewModel;
 
 public class SidebarPanel extends JPanel {
 
-    private final SidebarViewModel viewModel;
+    // Constants
+    private static final int COMPONENT_HEIGHT = 25;
+    private static final int VERTICAL_GAP = 5;
 
+    // UI Components - Language Selection
     private final JComboBox<Language> sourceLanguageSelector;
     private final JComboBox<Language> targetLanguageSelector;
+
+    // UI Components - Search Configuration
     private final JComboBox<SearchType> searchTypeSelector;
     private final JCheckBox trackingCheckbox;
+
+    // UI Components - Input/Output
     private final JTextField wordInput;
     private final JTextField resultField;
     private final JTextField indexField;
+
+    // UI Components - Controls
     private final JButton searchButton;
     private final JButton clearButton;
-    private final JButton openDictionaryButton;
-    private final JLabel errorLabel;  // Add this field
+    private final JLabel errorLabel;
 
-    public SidebarPanel(int width, SidebarViewModel viewModel) {
-        this.viewModel = viewModel;
+    /**
+     * Constructs a new SidebarPanel with the specified width
+     */
+    public SidebarPanel(int width) {
+        // Initialize components
+        sourceLanguageSelector = new JComboBox<>(Language.values());
+        targetLanguageSelector = new JComboBox<>(Language.values());
+        searchTypeSelector = new JComboBox<>(SearchType.values());
+        trackingCheckbox = new JCheckBox("Enable Step Tracking");
+        wordInput = createTextField();
+        resultField = createTextField();
+        indexField = createTextField();
+        searchButton = createButton("Search", width);
+        clearButton = createButton("Clear", width);
+        errorLabel = createErrorLabel();
 
-        // Initialize all components first
-        this.sourceLanguageSelector = new JComboBox<>(Language.values());
-        this.targetLanguageSelector = new JComboBox<>(Language.values());
-        this.searchTypeSelector = new JComboBox<>(SearchType.values());
-        this.trackingCheckbox = new JCheckBox("Enable Step Tracking");
-        this.wordInput = createTextField();
-        this.resultField = createTextField();
-        this.indexField = createTextField();
-        this.searchButton = createButton("Search", width, 35);
-        this.clearButton = createButton("Clear", width, 35);
-        this.openDictionaryButton = createButton("Open Dictionary", width, 35);
-        this.errorLabel = new JLabel();
-        errorLabel.setForeground(Color.RED);
-        errorLabel.setVisible(false);
+        setupLayout(width);
+        configureComponents();
+    }
 
-        // Setup panel properties
+    // Layout Setup Methods
+    private void setupLayout(int width) {
         setPreferredSize(new Dimension(width, 0));
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
-        // Setup components
-        setupComponents(width);
-        setupValidation();
-        setupListeners();
-        setupBindings();
+        addComponents(width);
     }
 
-    private void setupComponents(int width) {
-        // Source Language
-        add(createLabel("Source Language"));
-        setComponentSize(sourceLanguageSelector, width, 25);
-        add(sourceLanguageSelector);
-        addVerticalSpace(10);
-
-        // Input word
-        add(createLabel("Word to Translate"));
-        setComponentSize(wordInput, width, 25);
-        add(wordInput);
+    private void addComponents(int width) {
+        // Language Selection
+        addLabeledComponent("Source Language", sourceLanguageSelector, width);
+        addLabeledComponent("Word to Translate", wordInput, width);
         add(errorLabel);
-        setComponentSize(errorLabel, width, 25);
-        addVerticalSpace(5);
-        addVerticalSpace(10);
+        addLabeledComponent("Target Language", targetLanguageSelector, width);
 
-        // Target Language
-        add(createLabel("Target Language"));
-        setComponentSize(targetLanguageSelector, width, 25);
-        add(targetLanguageSelector);
-        addVerticalSpace(10);
-
-        // Search type selector
-        add(createLabel("Search Algorithm"));
-        setComponentSize(searchTypeSelector, width, 25);
-        add(searchTypeSelector);
-        addVerticalSpace(10);
-
-        // Tracking checkbox
+        // Search Configuration
+        addLabeledComponent("Search Algorithm", searchTypeSelector, width);
         add(trackingCheckbox);
-        addVerticalSpace(10);
 
-        // Search button
+        // Results
+        addLabeledComponent("Translation", resultField, width);
+        addLabeledComponent("Found at Index", indexField, width);
+
+        // Control Buttons
         add(searchButton);
-        addVerticalSpace(10);
-
-        // Result
-        add(createLabel("Translation"));
-        resultField.setEnabled(false);
-        add(resultField);
-        addVerticalSpace(10);
-
-        // Index
-        add(createLabel("Found at Index"));
-        indexField.setEnabled(false);
-        add(indexField);
-        addVerticalSpace(10);
-
-        // Clear button
+        addVerticalSpace(VERTICAL_GAP);
         add(clearButton);
-        addVerticalSpace(10);
-
-        // Open Dictionary button
-        add(openDictionaryButton);
     }
 
-    private JLabel createLabel(String text) {
-        JLabel label = new JLabel(text);
-        label.setAlignmentX(LEFT_ALIGNMENT);
+    // Component Creation Methods
+    private void addLabeledComponent(String labelText, JComponent component, int width) {
+        JLabel label = new JLabel(labelText);
+        label.setPreferredSize(new Dimension(width, COMPONENT_HEIGHT));
+        component.setPreferredSize(new Dimension(width, COMPONENT_HEIGHT));
+        add(label);
+        add(component);
+    }
+
+    private JLabel createErrorLabel() {
+        JLabel label = new JLabel();
+        label.setForeground(Color.RED);
+        label.setVisible(false);
         return label;
     }
 
     private JTextField createTextField() {
         JTextField field = new JTextField();
-        setComponentSize(field, 250, 25);
+        field.setEditable(true);
         return field;
     }
 
-    private JButton createButton(String text, int width, int height) {
+    private JButton createButton(String text, int width) {
         JButton button = new JButton(text);
-        setComponentSize(button, width, height);
+        Dimension size = new Dimension(width, COMPONENT_HEIGHT);
+        button.setPreferredSize(size);
+        button.setMaximumSize(size);
+        button.setAlignmentX(CENTER_ALIGNMENT);
         return button;
     }
 
-    private void setComponentSize(JComponent component, int width, int height) {
-        component.setMaximumSize(new Dimension(width, height));
-        component.setPreferredSize(new Dimension(width, height));
-        component.setMinimumSize(new Dimension(width, height));
-        component.setAlignmentX(LEFT_ALIGNMENT);
+    // Configuration Methods
+    private void configureComponents() {
+        wordInput.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                validateInput();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                validateInput();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                validateInput();
+            }
+
+            private void validateInput() {
+                String text = wordInput.getText();
+                if (text == null || text.isBlank()) {
+                    showError("Word cannot be empty");
+                } else if (!text.matches("[a-zA-Z\\s-]+")) {
+                    showError("Word can only contain letters, spaces and hyphens");
+                } else {
+                    hideError();
+                }
+            }
+        });
     }
 
-    private void addVerticalSpace(int height) {
-        add(Box.createRigidArea(new Dimension(0, height)));
+    // Public API Methods - Getters and Setters
+    public void setSourceLanguage(Language language) {
+        sourceLanguageSelector.setSelectedItem(language);
     }
 
-    // Getters
     public Language getSourceLanguage() {
         return (Language) sourceLanguageSelector.getSelectedItem();
+    }
+
+    public void setTargetLanguage(Language language) {
+        targetLanguageSelector.setSelectedItem(language);
     }
 
     public Language getTargetLanguage() {
         return (Language) targetLanguageSelector.getSelectedItem();
     }
 
-    public SearchType getSelectedSearchType() {
+    public void setSearchType(SearchType type) {
+        searchTypeSelector.setSelectedItem(type);
+    }
+
+    public SearchType getSearchType() {
         return (SearchType) searchTypeSelector.getSelectedItem();
     }
 
-    public boolean isTrackingEnabled() {
+    public void setTracking(boolean enabled) {
+        trackingCheckbox.setSelected(enabled);
+    }
+
+    public boolean isTracking() {
         return trackingCheckbox.isSelected();
     }
 
-    private void setupListeners() {
-        searchButton.addActionListener(e -> {
-            try {
-                String word = wordInput.getText();
-                Language source = getSourceLanguage();
-                Language target = getTargetLanguage();
-                
-                // Final validation before search
-                validateAll();
-                
-                // If validation passes, perform search
-                viewModel.search(word, source, target);
-            } catch (ValidationException ex) {
-                showError(ex.getMessage());
-            }
-        });
-
-        clearButton.addActionListener(e -> {
-            wordInput.setText("");
-            resultField.setText("");
-            indexField.setText("");
-        });
-
-        searchTypeSelector.addActionListener(e -> {
-            SearchType type = getSelectedSearchType();
-            viewModel.setSearchStrategy(type, trackingCheckbox.isSelected());
-        });
-
-        // Add change listeners to prevent same language selection
-        sourceLanguageSelector.addActionListener(e -> validateLanguageSelection());
-        targetLanguageSelector.addActionListener(e -> validateLanguageSelection());
+    public String getWordInput() {
+        return wordInput.getText();
     }
 
-    private void validateLanguageSelection() {
-        Language source = getSourceLanguage();
-        Language target = getTargetLanguage();
-        
-        searchButton.setEnabled(source != target);
-        if (source == target) {
-            showError("Source and target languages must be different");
-        }
+    public void setWordInput(String text) {
+        wordInput.setText(text);
     }
 
-    private void setupBindings() {
-        viewModel.addPropertyChangeListener(evt -> {
-            switch (evt.getPropertyName()) {
-                case "translatedText" ->
-                    resultField.setText((String) evt.getNewValue());
-                case "foundIndex" ->
-                    indexField.setText((String) evt.getNewValue());
-                case "searching" -> {
-                    boolean searching = (boolean) evt.getNewValue();
-                    searchButton.setEnabled(!searching);
-                    wordInput.setEnabled(!searching);
-                }
-                default -> {
-                    // Handle unexpected property changes if necessary
-                }
-            }
-        });
+    public void setResult(String text) {
+        resultField.setText(text);
     }
 
-    private void setupValidation() {
-        // Validate on language selection change
-        sourceLanguageSelector.addActionListener(e -> validateAll());
-        targetLanguageSelector.addActionListener(e -> validateAll());
-        
-        // Validate on word input change
-        wordInput.getDocument().addDocumentListener(new DocumentListener() {
-            public void changedUpdate(DocumentEvent e) { validateAll(); }
-            public void removeUpdate(DocumentEvent e) { validateAll(); }
-            public void insertUpdate(DocumentEvent e) { validateAll(); }
-        });
+    public void setIndex(String index) {
+        indexField.setText(index);
     }
 
-    private void validateAll() {
-        try {
-            // Clear previous error
-            hideError();
-            
-            // Get current values
-            String word = wordInput.getText();
-            Language source = getSourceLanguage();
-            Language target = getTargetLanguage();
-
-            // Validate languages
-            validateLanguages(source, target);
-            
-            // Validate word
-            validateWord(word);
-            
-            // Enable search if all valid
-            searchButton.setEnabled(true);
-            
-        } catch (ValidationException ex) {
-            showError(ex.getMessage());
-            searchButton.setEnabled(false);
-        }
+    public void setSearchEnabled(boolean enabled) {
+        searchButton.setEnabled(enabled);
     }
 
-    private void validateLanguages(Language source, Language target) {
-        if (source == null || target == null) {
-            throw new ValidationException("Please select both languages");
-        }
-        if (source == target) {
-            throw new ValidationException("Source and target languages must be different");
-        }
+    public void clearFields() {
+        wordInput.setText("");
+        resultField.setText("");
+        indexField.setText("");
+        hideError();
     }
 
-    private void validateWord(String word) {
-        if (word == null || word.isBlank()) {
-            throw new ValidationException("Word cannot be empty");
-        }
-        if (word.length() > 100) {
-            throw new ValidationException("Word is too long (max 100 characters)");
-        }
-        if (!word.matches("[a-zA-Z\\s-]+")) {
-            throw new ValidationException("Word can only contain letters, spaces and hyphens");
-        }
-    }
-
-    private void showError(String message) {
+    // Public API Methods - UI State Management
+    public void showError(String message) {
         errorLabel.setText(message);
         errorLabel.setVisible(true);
     }
 
-    private void hideError() {
-        errorLabel.setText("");
+    public void hideError() {
         errorLabel.setVisible(false);
+    }
+
+    // Event Registration Methods
+    public void addSearchListener(Runnable action) {
+        searchButton.addActionListener(e -> action.run());
+    }
+
+    public void addClearListener(Runnable action) {
+        clearButton.addActionListener(e -> action.run());
+    }
+
+    public void addSearchTypeListener(Runnable action) {
+        searchTypeSelector.addActionListener(e -> action.run());
+    }
+
+    public void addTrackingListener(Runnable action) {
+        trackingCheckbox.addActionListener(e -> action.run());
+    }
+
+    public void addWordValidationListener(Runnable action) {
+        wordInput.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                action.run();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                action.run();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                action.run();
+            }
+        });
+    }
+
+    public void addLanguageValidationListener(Runnable action) {
+        sourceLanguageSelector.addActionListener(e -> action.run());
+        targetLanguageSelector.addActionListener(e -> action.run());
+    }
+
+    // Helper Methods
+    private void addVerticalSpace(int height) {
+        add(Box.createRigidArea(new Dimension(0, height)));
     }
 }
