@@ -1,6 +1,5 @@
 package com.coffeecode.gui;
 
-import java.awt.Color;
 import java.awt.Dimension;
 
 import javax.swing.BorderFactory;
@@ -41,11 +40,8 @@ public class SidebarPanel extends JPanel {
     // UI Components - Controls
     private final JButton searchButton;
     private final JButton clearButton;
-    private final JLabel errorLabel;
+    private final JTextField errorInputInfo;
 
-    /**
-     * Constructs a new SidebarPanel with the specified width
-     */
     public SidebarPanel(int width) {
         // Initialize components
         sourceLanguageSelector = new JComboBox<>(Language.values());
@@ -57,7 +53,7 @@ public class SidebarPanel extends JPanel {
         indexField = createTextField();
         searchButton = createButton("Search", width);
         clearButton = createButton("Clear", width);
-        errorLabel = createErrorLabel();
+        errorInputInfo = createErrorInputField(width);
 
         setupLayout(width);
         configureComponents();
@@ -75,7 +71,7 @@ public class SidebarPanel extends JPanel {
         // Language Selection
         addLabeledComponent("Source Language", sourceLanguageSelector, width);
         addLabeledComponent("Word to Translate", wordInput, width);
-        add(errorLabel);
+        addLabeledComponent("Error Info", errorInputInfo, width);
         addLabeledComponent("Target Language", targetLanguageSelector, width);
 
         // Search Configuration
@@ -101,11 +97,11 @@ public class SidebarPanel extends JPanel {
         add(component);
     }
 
-    private JLabel createErrorLabel() {
-        JLabel label = new JLabel();
-        label.setForeground(Color.RED);
-        label.setVisible(false);
-        return label;
+    private JTextField createErrorInputField(int width) {
+        JTextField field = new JTextField();
+        field.setEditable(false);
+        field.setPreferredSize(new Dimension(width, COMPONENT_HEIGHT * 2));
+        return field;
     }
 
     private JTextField createTextField() {
@@ -216,12 +212,12 @@ public class SidebarPanel extends JPanel {
 
     // Public API Methods - UI State Management
     public void showError(String message) {
-        errorLabel.setText(message);
-        errorLabel.setVisible(true);
+        errorInputInfo.setText(message);
+        errorInputInfo.setVisible(true);
     }
 
     public void hideError() {
-        errorLabel.setVisible(false);
+        errorInputInfo.setVisible(false);
     }
 
     // Event Registration Methods
