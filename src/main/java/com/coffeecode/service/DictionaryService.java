@@ -1,6 +1,5 @@
 package com.coffeecode.service;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -10,12 +9,12 @@ import com.coffeecode.config.AppConfig;
 import com.coffeecode.model.core.Dictionary;
 import com.coffeecode.model.core.Language;
 import com.coffeecode.model.core.Vocabulary;
-
 import com.coffeecode.model.json.service.IJsonService;
 import com.coffeecode.model.json.service.JsonServicesFactory;
 import com.coffeecode.model.search.SearchType;
 import com.coffeecode.model.search.context.SearchContext;
 import com.coffeecode.model.search.step.SearchStep;
+import com.coffeecode.validation.ValidationException;
 import com.coffeecode.validation.WordValidator;
 
 public class DictionaryService {
@@ -41,17 +40,27 @@ public class DictionaryService {
         return searchContext.getSteps();
     }
 
-    public String translate(String word, Language sourceLanguage) {
+    public String translate(String word, Language sourceLanguage, Language targetLanguage) {
         try {
+            // Validate inputs
             WordValidator.validateWord(word, sourceLanguage.name());
+            validateLanguages(sourceLanguage, targetLanguage);
+
+            // Process translation
             String sanitizedWord = WordValidator.sanitizeWord(word);
             List<Vocabulary> searchList = dictionary.getSearchList(sourceLanguage);
 
             return searchContext.search(searchList, sanitizedWord,
-                    sourceLanguage, sourceLanguage.opposite());
+                    sourceLanguage, targetLanguage);
         } catch (Exception e) {
             logger.error("Translation failed: {}", e.getMessage());
             throw new DictionaryServiceException("Translation failed", e);
+        }
+    }
+
+    private void validateLanguages(Language source, Language target) {
+        if (source == target) {
+            throw new ValidationException("Source and target languages must be different");
         }
     }
 
